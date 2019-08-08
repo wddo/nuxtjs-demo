@@ -3,7 +3,24 @@
     <header class="Header">
       <div class="container">
         <h1 class="Header__Title">header</h1>
-        <nav class="Header__Menu"></nav>
+        <nav class="Header__Menu">
+          <NuxtLink :to="$i18n.path('')" class="Header__Link" exact>{{ $t('links.home') }}</NuxtLink>
+          <NuxtLink :to="$i18n.path('about')" class="Header__Link" exact>{{ $t('links.about') }}</NuxtLink>
+          <NuxtLink
+            v-if="$i18n.locale === 'en'"
+            :to="`/kr${$route.fullPath}`"
+            class="Header__Link"
+            active-class="none"
+            exact
+          >{{ $t('links.korea') }}</NuxtLink>
+          <NuxtLink
+            v-else
+            :to="`/en${$route.fullPath.replace(/^\/[^\/]+/, '')}`"
+            class="Header__Link"
+            active-class="none"
+            exact
+          >{{ $t('links.english') }}</NuxtLink>
+        </nav>
       </div>
     </header>
 
