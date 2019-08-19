@@ -31,6 +31,13 @@ export default {
   data() {
     return {
       defaults: {
+        on: {
+          init: e => this.onChange(e, "init"),
+          slideChange: e => this.onChange(e, "slideChange"),
+          sliderMove: e => this.onChange(e, "sliderMove"),
+          transitionStart: e => this.onChange(e, "transitionStart"),
+          transitionEnd: e => this.onChange(e, "transitionEnd")
+        },
         pagination: {
           el: ".swiper-pagination",
           type: "bullets"
@@ -65,6 +72,12 @@ export default {
       return this.$attrs;
     }
   },
+  methods: {
+    onChange(e, type) {
+      const swiper = this.$el.swiper;
+      const idx = swiper.realIndex;
+    }
+  },
   mounted() {
     let opts = !this.options.freeMode
       ? { ...this.defaults }
@@ -80,8 +93,6 @@ export default {
 
     if (!_.isNaN(opts.slidesPerView) && _.isUndefined(opts.loopedSlides))
       _.set(opts, "loopedSlides", _.ceil(opts.slidesPerView));
-
-    console.log(opts);
 
     new Swiper(this.$el, opts);
   }
