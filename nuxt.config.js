@@ -18,9 +18,9 @@ module.exports = {
   /*
    ** Build configuration
    */
-  plugins: [{ src: "~plugins/notifications.js", injectAs: "wnotifications" }],
+  plugins: [{ src: "~plugins/WNotifications.js" }],
   build: {
-    vendor: ["~plugins/notifications.js"],
+    vendor: ["~plugins/WNotifications.js"],
     /*
      ** Run ESLint on save
      */

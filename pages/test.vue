@@ -1,7 +1,7 @@
 <template>
   <div>
     <button @click="openNotice">Tip!</button>
-    <wnotifications group="foo" />
+    <w-notifications group="foo" />
   </div>
 </template>
 
@@ -15,9 +15,8 @@ export default {
   mounted() {},
   methods: {
     openNotice() {
-      this.$wnotifications({
-        text: Math.random(10),
-        group: "foo"
+      Vue.$wnotifications({
+        text: Math.random(10)
       });
 
       /* Vue.wnotifications({
