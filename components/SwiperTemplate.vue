@@ -1,42 +1,47 @@
 <template>
-  <div class="swiper-container" :attrs="attrs">
+  <div class="swiper-container" v-bind="$attrs">
     <div class="swiper-wrapper">
       <slot />
     </div>
-    <div class="swiper-pagination"></div>
+    <slot name="pagination"></slot>
   </div>
 </template>
 
 <script>
-import Swiper from "swiper";
-import _ from "lodash";
+import Swiper from "swiper"
 
 const getChildrenTagContent = children => {
-  return children.filter(function(node) {
-    return node.tag;
-  });
-};
+  return _.filter(children, function(node) {
+    return node.tag
+  })
+}
 
 export default {
-  head() {
-    return {
-      link: [
-        {
-          rel: "stylesheet",
-          href: "/css/swiper.min.css"
-        }
-      ]
-    };
-  },
   data() {
     return {
       defaults: {
+        observer: true,
+        observeParents: true,
+        observeSlideChildren: true,
         on: {
           init: e => this.onChange(e, "init"),
           slideChange: e => this.onChange(e, "slideChange"),
           sliderMove: e => this.onChange(e, "sliderMove"),
           transitionStart: e => this.onChange(e, "transitionStart"),
-          transitionEnd: e => this.onChange(e, "transitionEnd")
+          transitionEnd: e => this.onChange(e, "transitionEnd"),
+          observerUpdate: e => {
+            //console.log("observerUpdate", e)
+
+            //history back 대응
+            if (
+              e.type === "attributes" &&
+              _.indexOf(e.target.classList, "page-enter-active") >= 0
+            ) {
+              console.log("!!!!! reset")
+
+              this.$swiper.reset(this.$el)
+            }
+          }
         },
         pagination: {
           el: ".swiper-pagination",
@@ -48,7 +53,7 @@ export default {
           loadPrevNext: true
         },
         autoplay: {
-          delay: 3500,
+          delay: 1500,
           disableOnInteraction: false
         }
       },
@@ -59,7 +64,7 @@ export default {
         roundLengths: true,
         autoplay: false
       }
-    };
+    }
   },
   props: {
     options: {
@@ -69,37 +74,38 @@ export default {
   },
   computed: {
     attrs() {
-      return this.$attrs;
+      return this.$attrs
     }
   },
   methods: {
     onChange(e, type) {
-      const swiper = this.$el.swiper;
-      const idx = swiper.realIndex;
+      const swiper = this.$el.swiper
+      const idx = swiper.realIndex
     }
   },
   mounted() {
-    let opts = !this.options.freeMode
-      ? { ...this.defaults }
-      : _.extend({}, this.defaults, this.freeDefaults);
+    let opts =
+      _.result(this, "options.freeMode") !== true
+        ? { ...this.defaults }
+        : _.extend({}, this.defaults, this.freeDefaults)
 
     _.set(
       opts,
       "loop",
       getChildrenTagContent(this.$slots.default).length > 1 && !opts.freeMode
-    );
+    )
 
-    opts = _.defaultsDeep(this.options, opts);
+    opts = _.defaultsDeep(this.options, opts)
 
     if (!_.isNaN(opts.slidesPerView) && _.isUndefined(opts.loopedSlides))
-      _.set(opts, "loopedSlides", _.ceil(opts.slidesPerView));
+      _.set(opts, "loopedSlides", _.ceil(opts.slidesPerView))
 
-    new Swiper(this.$el, opts);
+    new Swiper(this.$el, opts)
   }
-};
+}
 </script>
 
-<style >
+<style>
 .swiper-container {
   width: 100%;
   height: 100%;
