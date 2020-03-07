@@ -1,10 +1,5 @@
 import Vue from "vue"
-import vswiper from "~/plugins/vswiper"
+import vswiper from "~/plugins/directive/vswiper"
+import _ from "lodash"
 
-const Plugin = {
-  install(Vue, options) {
-    Vue.directive("swiper", vswiper)
-  }
-}
-
-Vue.use(Plugin)
+Vue.directive("swiper", vswiper)

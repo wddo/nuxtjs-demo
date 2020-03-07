@@ -1,26 +1,35 @@
 <template>
   <div>
     <h1>swiper test</h1>
+    <h2>msg : {{ msg }}</h2>
     <div>
       <button class="tabBtn" @click="clickHandler(1)">tab1</button>
       <button class="tabBtn" @click="clickHandler(2)">tab2</button>
     </div>
     <div>
       swiper 1
-      <div v-swiper class="swiper-container myswiper1" v-show="isShow === 1">
+      <div
+        v-swiper="swiperOptions"
+        @transitionEnd="onTransitionEnd"
+        class="swiper-container myswiper1"
+        v-show="isShowNum === 1"
+      >
         <div class="swiper-wrapper">
-          <div class="swiper-slide" v-for="(item, idx) in list" :key="idx">{{ item.name }}</div>
+          <a href="#" class="swiper-slide" @click.prevent="slideClick('/sub')" v-for="(item, idx) in list" :key="idx">
+            {{ item.name }}
+          </a>
         </div>
       </div>
     </div>
-    <div>
+    <!--div>
       swiper 2
-      <div v-swiper class="swiper-container myswiper2" v-show="isShow === 2">
+      <div v-swiper class="swiper-container myswiper2" v-show="isShowNum === 2">
         <div class="swiper-wrapper">
           <div class="swiper-slide" v-for="(item, idx) in list" :key="idx">{{ item.name }}</div>
         </div>
       </div>
-    </div>
+    </div-->
+    <router-link to="sub">sub</router-link>
   </div>
 </template>
 
@@ -28,28 +37,46 @@
 export default {
   data() {
     return {
-      isShow: 0,
-      list: []
+      isShowNum: 1,
+      list: [],
+      msg: "",
+      swiperOptions: {
+        on: {
+          transitionEnd: function() {
+            console.log("transitionEnd 11111")
+          }
+        }
+      }
     }
   },
+  created() {
+    console.log("!!!!! created")
+  },
   mounted() {
+    console.log("!!!!! mounted")
     setTimeout(() => {
-      this.list = [{ name: "item1" }, { name: "item2" }, { name: "item3" }, { name: "item4" }]
+      this.list = [{ name: "item1" }, { name: "item2" }]
 
-      this.isShow = 1
-    }, 2000)
+      this.isShowNum = 1
+      this.msg = "add item"
+    }, 500)
 
+    /*
     setTimeout(() => {
-      this.isShow = 2 //observeParents 테스트
+      this.list.unshift({ name: "item new" })
+      this.msg = "new item"
     }, 3000)
-
-    setTimeout(() => {
-      this.list.unshift({ name: "item0" })
-    }, 4000)
+    */
   },
   methods: {
     clickHandler(n) {
-      this.isShow = n
+      this.isShowNum = n
+    },
+    onTransitionEnd() {
+      console.log("transitionEnd 22222")
+    },
+    slideClick(link) {
+      if (link) this.$router.push(link)
     }
   }
 }
@@ -60,9 +87,14 @@ export default {
   height: 200px;
 }
 .myswiper1 .swiper-slide {
-  padding: 10px;
   background-color: #ccc;
   border: 1px solid red;
+}
+.myswiper1 .swiper-slide a {
+  display: inline-block;
+  padding: 10px;
+  width: 100%;
+  height: 100%;
 }
 
 .myswiper2 {

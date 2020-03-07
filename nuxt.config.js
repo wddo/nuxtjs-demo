@@ -18,7 +18,7 @@ module.exports = {
   /*
    ** plugins
    */
-  plugins: [{ src: "~plugins", mode: "client" }],
+  plugins: [{ src: "~plugins/index", mode: "client" }],
   /*
    ** Customize the progress bar color
    */
