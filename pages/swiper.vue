@@ -19,16 +19,18 @@
             {{ item.name }}
           </a>
         </div>
+        <div class="swiper-pagination"></div>
       </div>
     </div>
-    <!--div>
+    <div>
       swiper 2
-      <div v-swiper class="swiper-container myswiper2" v-show="isShowNum === 2">
+      <div v-swiper="swiperOptions2" class="swiper-container myswiper2">
         <div class="swiper-wrapper">
           <div class="swiper-slide" v-for="(item, idx) in list" :key="idx">{{ item.name }}</div>
         </div>
+        <div class="swiper-pagination"></div>
       </div>
-    </div-->
+    </div>
     <router-link to="sub">sub</router-link>
   </div>
 </template>
@@ -41,10 +43,20 @@ export default {
       list: [],
       msg: "",
       swiperOptions: {
+        pagination: {
+          el: ".swiper-pagination",
+          type: "fraction"
+        },
         on: {
           transitionEnd: function() {
             console.log("transitionEnd 11111")
           }
+        }
+      },
+      swiperOptions2: {
+        pagination: {
+          el: ".swiper-pagination",
+          type: "fraction"
         }
       }
     }
@@ -55,7 +67,7 @@ export default {
   mounted() {
     console.log("!!!!! mounted")
     setTimeout(() => {
-      this.list = [{ name: "item1" }, { name: "item2" }]
+      this.list = [{ name: "item1" }, { name: "item2" }, { name: "item3" }, { name: "item4" }]
 
       this.isShowNum = 1
       this.msg = "add item"

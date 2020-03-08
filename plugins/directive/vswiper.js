@@ -23,17 +23,21 @@ function getDefaultObject(vnode) {
     observeSlideChildren: true,
     on: {
       observerUpdate: function(e) {
+        //history back 대응
         if (
-          e.type === "childList" &&
-          e.target.classList.contains("swiper-wrapper")
+          e.type === "attributes" &&
+          _.indexOf(e.target.classList, "page-enter-active") >= 0
         ) {
-          const sipwer = e.target.parentElement.swiper
-          //resetSwiper(sipwer.el, { value: sipwer.params })
+          resetSwiper(this.el, { value: this.options }, vnode)
+          //this.update()
         }
       },
       click: function(e) {
         if (
-          _.indexOf(this.clickedSlide.classList, "swiper-slide-duplicate") >= 0
+          _.indexOf(
+            _.result(this, "clickedSlide.classList"),
+            "swiper-slide-duplicate"
+          ) >= 0
         ) {
           const clickIdx = this.clickedSlide.dataset.swiperSlideIndex
           const realSlides = _.result(vnode, "children[0].children")
@@ -52,6 +56,54 @@ function getDefaultObject(vnode) {
       }
     }
   }
+}
+
+function deleteSwiper(el) {
+  if (!_.isNil(_.get(el, "swiper"))) {
+    const swiper = el.swiper
+    swiper.destroy(false, true)
+  }
+}
+
+function initSwiper(el, binding, vnode) {
+  const opts = _.merge({}, getDefaultObject(vnode), binding.value)
+  const swiper = new Swiper(el, opts)
+  swiper.options = binding.value
+}
+
+function resetSwiper(el, binding, vnode) {
+  deleteSwiper(el)
+  initSwiper(el, binding, vnode)
+  initeEvent(el, vnode)
+}
+
+function initeEvent(el, vnode) {
+  const swiper = el.swiper
+  const vOnObj = _.result(vnode, "data.on", {})
+
+  //v-on 대응
+  _.forEach(vOnObj, (fns, eventName) => {
+    swiper.on(eventName, fns)
+  })
+
+  //change Evnet
+  _.forEach(CHANGE_EVENT, eventName => {
+    swiper.on(
+      eventName,
+      function() {
+        onChange(this.swiper, this.type)
+      }.bind({ swiper, type: eventName })
+    )
+  })
+
+  /*const slideVnodes = _.result(vnode, "children[0].children", {})
+  _.forEach(slideVnodes, slide => {
+    swiper.on("click", _.get(slide, "data.on.click"))
+  })*/
+}
+
+function onChange(swiper, type) {
+  //console.log("change" /*, type, swiper*/)
 }
 
 if (process.client) {
@@ -93,51 +145,4 @@ if (process.client) {
 
     window.MouseEvent = MouseEventPolyfill
   })(window)
-}
-
-function deleteSwiper(el) {
-  if (!_.isNil(_.get(el, "swiper"))) {
-    const swiper = el.swiper
-    swiper.destroy(false, true)
-  }
-}
-
-function initSwiper(el, binding, vnode) {
-  const opts = _.merge({}, getDefaultObject(vnode), binding.value)
-  new Swiper(el, opts)
-}
-
-function resetSwiper(el, binding, vnode) {
-  deleteSwiper(el)
-  initSwiper(el, binding, vnode)
-  initeEvent(el, vnode)
-}
-
-function initeEvent(el, vnode) {
-  const swiper = el.swiper
-  const vOnObj = _.result(vnode, "data.on", {})
-
-  //v-on 대응
-  _.forEach(vOnObj, (fns, eventName) => {
-    swiper.on(eventName, fns)
-  })
-
-  //change Evnet
-  _.forEach(CHANGE_EVENT, eventName => {
-    swiper.on(
-      eventName,
-      function() {
-        onChange(this.swiper, this.type)
-      }.bind({ swiper, type: eventName })
-    )
-  })
-
-  /*const slideVnodes = _.result(vnode, "children[0].children", {})
-  _.forEach(slideVnodes, slide => {
-    swiper.on("click", _.get(slide, "data.on.click"))
-  })*/
-}
-
-function onChange(swiper, type) {
-  //console.log("change" /*, type, swiper*/)
 }
