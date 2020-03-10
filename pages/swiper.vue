@@ -22,7 +22,7 @@
         <div class="swiper-pagination"></div>
       </div>
     </div>
-    <div>
+    <!--div>
       swiper 2
       <div v-swiper="swiperOptions2" class="swiper-container myswiper2">
         <div class="swiper-wrapper">
@@ -30,7 +30,7 @@
         </div>
         <div class="swiper-pagination"></div>
       </div>
-    </div>
+    </div-->
     <router-link to="sub">sub</router-link>
   </div>
 </template>

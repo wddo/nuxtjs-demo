@@ -31,6 +31,14 @@ function getDefaultObject(vnode) {
           resetSwiper(this.el, { value: this.options }, vnode)
           //this.update()
         }
+
+        if (
+          e.type === "childList" &&
+          _.indexOf(e.target.classList, "swiper-container") >= 0
+        ) {
+          if (!_.isNil(_.result(e.target, "swiper")))
+            onChange(e.target.swiper, "init") //init 대신
+        }
       },
       click: function(e) {
         if (
@@ -40,16 +48,25 @@ function getDefaultObject(vnode) {
           ) >= 0
         ) {
           const clickIdx = this.clickedSlide.dataset.swiperSlideIndex
-          const realSlides = _.result(vnode, "children[0].children")
+          const realSlides = _.at(
+            _.result(vnode, "children[0].children"),
+            clickIdx
+          )
 
           _.forEach(realSlides, item => {
             if (!_.isNil(_.get(item, "data.on.click.fns"))) {
-              var evt = new MouseEvent("click", {
-                bubbles: true,
-                cancelable: true,
-                view: window
-              })
-              item.data.on.click.fns(evt)
+              let evt
+
+              if (e.type === "mouseup") {
+                evt = e
+              } else if (e.type === "touchend") {
+                evt = new MouseEvent("click", {
+                  bubbles: true,
+                  cancelable: true
+                })
+              }
+
+              if (evt) item.data.on.click.fns(evt)
             }
           })
         }
@@ -95,54 +112,18 @@ function initeEvent(el, vnode) {
       }.bind({ swiper, type: eventName })
     )
   })
-
-  /*const slideVnodes = _.result(vnode, "children[0].children", {})
-  _.forEach(slideVnodes, slide => {
-    swiper.on("click", _.get(slide, "data.on.click"))
-  })*/
 }
 
 function onChange(swiper, type) {
-  //console.log("change" /*, type, swiper*/)
-}
-
-if (process.client) {
-  //https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/MouseEvent
-  ;(function(window) {
-    try {
-      new MouseEvent("test")
-      return false // No need to polyfill
-    } catch (e) {
-      // Need to polyfill - fall through
-    }
-
-    // Polyfills DOM4 MouseEvent
-    var MouseEventPolyfill = function(eventType, params) {
-      params = params || { bubbles: false, cancelable: false }
-      var mouseEvent = document.createEvent("MouseEvent")
-      mouseEvent.initMouseEvent(
-        eventType,
-        params.bubbles,
-        params.cancelable,
-        window,
-        0,
-        params.screenX || 0,
-        params.screenY || 0,
-        params.clientX || 0,
-        params.clientY || 0,
-        params.ctrlKey || false,
-        params.altKey || false,
-        params.shiftKey || false,
-        params.metaKey || false,
-        params.button || 0,
-        params.relatedTarget || null
-      )
-
-      return mouseEvent
-    }
-
-    MouseEventPolyfill.prototype = Event.prototype
-
-    window.MouseEvent = MouseEventPolyfill
-  })(window)
+  if (type === "init") {
+    _.forEach(swiper.slides, item => {
+      if (_.indexOf(item.classList, "swiper-slide-duplicate") >= 0) {
+        const link = item.getAttribute("href")
+        if (!_.isNil(link) && link === "#")
+          item.addEventListener("click", function(e) {
+            e.preventDefault()
+          })
+      }
+    })
+  }
 }
