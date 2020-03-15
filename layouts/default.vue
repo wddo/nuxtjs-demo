@@ -1,8 +1,22 @@
 <template>
   <div>
+    <header-lnb></header-lnb>
     <nuxt keep-alive />
+    <bottom></bottom>
   </div>
 </template>
+
+<script>
+import headerLnb from "~/components/headerLnb"
+import bottom from "~/components/bottom"
+
+export default {
+  components: {
+    headerLnb,
+    bottom
+  }
+}
+</script>
 
 <style>
 html {
@@ -22,6 +36,19 @@ html {
 *:after {
   box-sizing: border-box;
   margin: 0;
+  text-decoration: none;
+}
+a:link,
+a:visited,
+a:active {
+  color: initial;
+}
+
+ul,
+li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .button--green {

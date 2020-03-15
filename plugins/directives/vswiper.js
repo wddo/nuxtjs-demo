@@ -7,9 +7,11 @@ const CHANGE_EVENT = [
 
 export default {
   bind: function(el, binding, vnode) {
-    initSwiper(el, binding, vnode)
+    console.log("!!!!! bind")
+    resetSwiper(el, binding, vnode)
   },
   componentUpdated: function(el, binding, vnode) {
+    console.log("!!!!! componentUpdated")
     resetSwiper(el, binding, vnode)
   }
 }
@@ -28,7 +30,7 @@ function getDefaultObject(vnode) {
           e.type === "attributes" &&
           _.indexOf(e.target.classList, "page-enter-active") >= 0
         ) {
-          resetSwiper(this.el, { value: this.options }, vnode)
+          resetSwiper(this.el, { value: this.params }, vnode)
           //this.update()
         }
 
@@ -75,21 +77,38 @@ function getDefaultObject(vnode) {
   }
 }
 
-function deleteSwiper(el) {
+function deleteSwiper(el, binding, vnode) {
   if (!_.isNil(_.get(el, "swiper"))) {
     const swiper = el.swiper
-    swiper.destroy(false, true)
+    if (swiper.params.init) swiper.destroy(false, true)
   }
 }
 
 function initSwiper(el, binding, vnode) {
-  const opts = _.merge({}, getDefaultObject(vnode), binding.value)
+  const value = el.swiper
+    ? _.merge({}, binding.value, el.swiper.options)
+    : binding.value
+
+  const opts = _.merge({}, getDefaultObject(vnode), value)
   const swiper = new Swiper(el, opts)
-  swiper.options = binding.value
+
+  swiper.$el.off("reset").on(
+    "reset",
+    function() {
+      resetSwiper(this.el, this.binding, this.vnode)
+    }.bind({ el, binding, vnode })
+  )
+
+  swiper.$el.off("update").on(
+    "update",
+    function() {
+      this.el.swiper.update()
+    }.bind({ el, binding, vnode })
+  )
 }
 
 function resetSwiper(el, binding, vnode) {
-  deleteSwiper(el)
+  deleteSwiper(el, binding, vnode)
   initSwiper(el, binding, vnode)
   initeEvent(el, vnode)
 }

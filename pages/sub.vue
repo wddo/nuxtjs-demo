@@ -1,7 +1,6 @@
 <template>
   <div>
     <h1>sub</h1>
-    <router-link to="swiper">swiper</router-link>
   </div>
 </template>
 

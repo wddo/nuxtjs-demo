@@ -1,19 +1,14 @@
 <template>
   <div>
     <h1>swiper test</h1>
-    <h2>msg : {{ msg }}</h2>
     <div>
-      <button class="tabBtn" @click="clickHandler(1)">tab1</button>
-      <button class="tabBtn" @click="clickHandler(2)">tab2</button>
+      <button class="tabBtn" @click="clickHandler(1)">show 1</button>
+      <button class="tabBtn" @click="clickHandler(2)">show 2</button>
+      <button class="tabBtn" @click="clickHandler(0)">toggle : {{ this.toggle }}</button>
     </div>
-    <div>
-      swiper 1
-      <div
-        v-swiper="swiperOptions"
-        @transitionEnd="onTransitionEnd"
-        class="swiper-container myswiper1"
-        v-show="isShowNum === 1"
-      >
+    <div v-show="isShowNum === 1 || (toggle && !isShowNum)">
+      <h3>swiper 1</h3>
+      <div v-swiper="swiperOptions" @transitionEnd="onTransitionEnd" class="swiper-container myswiper1">
         <div class="swiper-wrapper">
           <a href="#" class="swiper-slide" @click.prevent="slideClick('/sub')" v-for="(item, idx) in list" :key="idx">
             {{ item.name }}
@@ -22,16 +17,15 @@
         <div class="swiper-pagination"></div>
       </div>
     </div>
-    <!--div>
-      swiper 2
+    <div v-show="isShowNum === 2 || (toggle && !isShowNum)">
+      <h3>swiper 2</h3>
       <div v-swiper="swiperOptions2" class="swiper-container myswiper2">
         <div class="swiper-wrapper">
           <div class="swiper-slide" v-for="(item, idx) in list" :key="idx">{{ item.name }}</div>
         </div>
         <div class="swiper-pagination"></div>
       </div>
-    </div-->
-    <router-link to="sub">sub</router-link>
+    </div>
   </div>
 </template>
 
@@ -40,6 +34,7 @@ export default {
   data() {
     return {
       isShowNum: 1,
+      toggle: true,
       list: [],
       msg: "",
       swiperOptions: {
@@ -70,7 +65,7 @@ export default {
       this.list = [{ name: "item1" }, { name: "item2" }, { name: "item3" }, { name: "item4" }]
 
       this.isShowNum = 1
-      this.msg = "add item"
+      this.$eventBus.$emit(this.EVENT.TRACE, "add item")
     }, 500)
 
     /*
@@ -83,6 +78,8 @@ export default {
   methods: {
     clickHandler(n) {
       this.isShowNum = n
+
+      if (!n) this.toggle = !this.toggle
     },
     onTransitionEnd() {
       console.log("transitionEnd 22222")
