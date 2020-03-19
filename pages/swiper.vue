@@ -38,6 +38,8 @@ export default {
       list: [],
       msg: "",
       swiperOptions: {
+        loop: true,
+        spaceBetween: 10,
         pagination: {
           el: ".swiper-pagination",
           type: "fraction"
@@ -49,6 +51,8 @@ export default {
         }
       },
       swiperOptions2: {
+        loop: true,
+        spaceBetween: 10,
         pagination: {
           el: ".swiper-pagination",
           type: "fraction"

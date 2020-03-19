@@ -9,17 +9,34 @@ export default {
   bind: function(el, binding, vnode) {
     console.log("!!!!! bind")
     resetSwiper(el, binding, vnode)
+
+    el.addEventListener("update", function(e) {
+      const swiper = e.target.swiper
+      if (!_.isNil(swiper)) swiper.update()
+    })
+
+    el.addEventListener("reset", function(e) {
+      const swiper = e.target.swiper
+
+      if (!_.isNil(swiper)) {
+        binding.value = _.merge({}, binding.value, swiper.options)
+        delete swiper.options
+
+        resetSwiper(el, binding, vnode)
+      }
+    })
   },
   componentUpdated: function(el, binding, vnode) {
     console.log("!!!!! componentUpdated")
     resetSwiper(el, binding, vnode)
+  },
+  unbind: function(el, binding, vnode) {
+    deleteSwiper(el, binding, vnode)
   }
 }
 
 function getDefaultObject(vnode) {
   return {
-    loop: true,
-    spaceBetween: 10,
     observer: true,
     observeParents: true,
     observeSlideChildren: true,
@@ -30,8 +47,7 @@ function getDefaultObject(vnode) {
           e.type === "attributes" &&
           _.indexOf(e.target.classList, "page-enter-active") >= 0
         ) {
-          resetSwiper(this.el, { value: this.params }, vnode)
-          //this.update()
+          e.target.dispatchEvent(new CustomEvent("reset"))
         }
 
         if (
@@ -49,28 +65,26 @@ function getDefaultObject(vnode) {
             "swiper-slide-duplicate"
           ) >= 0
         ) {
-          const clickIdx = this.clickedSlide.dataset.swiperSlideIndex
-          const realSlides = _.at(
-            _.result(vnode, "children[0].children"),
-            clickIdx
+          const slide = this.clickedSlide
+          const clickIdx = slide.dataset.swiperSlideIndex
+          const realSlide = _.head(
+            _.at(_.result(vnode, "children[0].children"), clickIdx)
           )
 
-          _.forEach(realSlides, item => {
-            if (!_.isNil(_.get(item, "data.on.click.fns"))) {
-              let evt
+          if (!_.isNil(_.get(realSlide, "data.on.click.fns"))) {
+            let evt
 
-              if (e.type === "mouseup") {
-                evt = e
-              } else if (e.type === "touchend") {
-                evt = new MouseEvent("click", {
-                  bubbles: true,
-                  cancelable: true
-                })
-              }
-
-              if (evt) item.data.on.click.fns(evt)
+            if (e.type === "mouseup") {
+              evt = e
+            } else if (e.type === "touchend") {
+              evt = new MouseEvent("click", {
+                bubbles: true,
+                cancelable: true
+              })
             }
-          })
+
+            if (evt) realSlide.data.on.click.fns(evt)
+          }
         }
       }
     }
@@ -85,26 +99,8 @@ function deleteSwiper(el, binding, vnode) {
 }
 
 function initSwiper(el, binding, vnode) {
-  const value = el.swiper
-    ? _.merge({}, binding.value, el.swiper.options)
-    : binding.value
-
-  const opts = _.merge({}, getDefaultObject(vnode), value)
+  const opts = _.merge({}, getDefaultObject(vnode), binding.value)
   const swiper = new Swiper(el, opts)
-
-  swiper.$el.off("reset").on(
-    "reset",
-    function() {
-      resetSwiper(this.el, this.binding, this.vnode)
-    }.bind({ el, binding, vnode })
-  )
-
-  swiper.$el.off("update").on(
-    "update",
-    function() {
-      this.el.swiper.update()
-    }.bind({ el, binding, vnode })
-  )
 }
 
 function resetSwiper(el, binding, vnode) {

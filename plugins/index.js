@@ -32,8 +32,7 @@ Vue.prototype.$fx = {
       _.map(swipers, item => {
         if (item.swiper) {
           item.swiper.options = _.merge({}, item.swiper.options, opts)
-          item.swiper.$el.trigger(opts.eventName)
-          //item.dispatchEvent(new Event(opts.eventName))
+          item.dispatchEvent(new CustomEvent(opts.eventName))
         }
       })
     }

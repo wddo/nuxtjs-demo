@@ -13,7 +13,7 @@ module.exports = {
       { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
       { rel: "stylesheet", href: "/css/swiper.css" }
     ],
-    script: [{ src: "/js/swiper.js" }]
+    script: [{ src: "/js/polyfill.js" }, { src: "/js/swiper.js" }]
   },
   /*
    ** plugins
