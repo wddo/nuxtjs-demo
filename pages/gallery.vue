@@ -13,7 +13,7 @@
       >
         <div class="swiper-wrapper">
           <a href="#" class="swiper-slide" v-for="(item, idx) in list" :key="idx">
-            {{ item.name }}
+            <img :src="item.src" />
           </a>
         </div>
         <div class="swiper-pagination"></div>
@@ -29,7 +29,7 @@
       >
         <div class="swiper-wrapper">
           <a href="#" class="swiper-slide" v-for="(item, idx) in list" :key="idx">
-            {{ item.name }}
+            <img :src="item.src" />
           </a>
         </div>
       </div>
@@ -51,16 +51,16 @@ export default {
       type: "pc",
       list: [],
       oriList: [
-        { name: "slide1" },
-        { name: "slide2" },
-        { name: "slide3" },
-        { name: "slide4" },
-        { name: "slide5" },
-        { name: "slide6" },
-        { name: "slide7" },
-        { name: "slide8" },
-        { name: "slide9" },
-        { name: "slide10" }
+        { name: "slide1", src: "http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg" },
+        { name: "slide2", src: "http://image1.hanatour.com/_images/main/md/banner_298.jpg" },
+        { name: "slide3", src: "http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg" },
+        { name: "slide4", src: "http://image1.hanatour.com/_images/main/md/banner_298.jpg" },
+        { name: "slide5", src: "http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg" },
+        { name: "slide6", src: "http://image1.hanatour.com/_images/main/md/banner_298.jpg" },
+        { name: "slide7", src: "http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg" },
+        { name: "slide8", src: "http://image1.hanatour.com/_images/main/md/banner_298.jpg" },
+        { name: "slide9", src: "http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg" },
+        { name: "slide10", src: "http://image1.hanatour.com/_images/main/md/banner_298.jpg" }
       ],
       swiperTopOptions: {
         effect: "fade",
@@ -91,10 +91,11 @@ export default {
   },
   mounted() {
     console.log("!!!!! mounted")
+
     this.list = _.take(this.oriList, this.oriList.length)
 
     this.$nextTick(() => {
-      this.$fx.swiper.reset(this.$refs.swiperTop, { thumbs: { swiper: this.$refs.swiperThumbs.swiper } })
+      this.$fx.swiper.resetGallery(this)
     })
   },
   methods: {
@@ -113,7 +114,7 @@ export default {
       }
 
       this.$nextTick(() => {
-        this.$fx.swiper.reset(this.$refs.swiperTop, { thumbs: { swiper: this.$refs.swiperThumbs.swiper } })
+        this.$fx.swiper.resetGallery(this)
       })
     },
     naviHandler(e) {
@@ -134,6 +135,8 @@ export default {
       const target = e.currentTarget
       const topSwiper = this.$refs.swiperTop.swiper
       const thumbsSwiper = topSwiper.thumbs.swiper
+
+      if (!topSwiper || !thumbsSwiper) return
 
       const currentIdx = thumbsSwiper.realIndex
       const totalIdx = thumbsSwiper.slides.length - 1
@@ -205,6 +208,17 @@ export default {
   height: 50vh;
 }
 
+.swiper-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 0;
+}
+
+[data-object-fit="cover"] {
+  object-fit: cover;
+}
+
 .swiper-top .swiper-slide {
   display: inline-block;
   background-color: gray;
@@ -229,8 +243,15 @@ export default {
   margin-right: 0;
 }
 
-.swiper-thumbs .swiper-slide.swiper-slide-thumb-active {
-  background-color: red;
+.swiper-thumbs .swiper-slide.swiper-slide-thumb-active:after {
+  content: "";
+  position: absolute;
+  display: inline-block;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 2px solid red;
 }
 
 .category {

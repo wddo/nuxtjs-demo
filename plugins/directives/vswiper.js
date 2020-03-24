@@ -37,6 +37,7 @@ export default {
 
 function getDefaultObject(vnode) {
   return {
+    roundLengths: true,
     observer: true,
     observeParents: true,
     observeSlideChildren: true,
@@ -101,6 +102,32 @@ function deleteSwiper(el, binding, vnode) {
 function initSwiper(el, binding, vnode) {
   const opts = _.merge({}, getDefaultObject(vnode), binding.value)
   const swiper = new Swiper(el, opts)
+
+  //object-fit IE 대응
+  $nuxt.$nextTick(function() {
+    if (!process.client || _.isNil(_.result(document, "documentElement.style")))
+      return
+
+    if ("objectFit" in document.documentElement.style === false) {
+      Array.prototype.forEach.call(
+        el.querySelectorAll(".swiper-slide img"),
+        function(image) {
+          //data-object-fit 초기화
+          if (image.src.indexOf("data:") === 0) {
+            image.src = image.style.backgroundImage.replace(
+              /^url|[\("|'\"|')]/g,
+              ""
+            )
+            image.style.background = ""
+          }
+
+          //data-object-fit 정의
+          image.style.background = `url("${image.src}") no-repeat 50% / cover`
+          image.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${image.width}' height='${image.height}'%3E%3C/svg%3E`
+        }
+      )
+    }
+  })
 }
 
 function resetSwiper(el, binding, vnode) {
