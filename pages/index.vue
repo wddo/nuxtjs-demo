@@ -14,7 +14,7 @@
       </div>
       <ul>
         <li><router-link to="./about">go about</router-link></li>
-        <li><router-link to="./mydirective">go my directive</router-link></li>
+        <li><router-link to="./company">go my company</router-link></li>
         <li><router-link to="./mycomponent">go my component</router-link></li>
       </ul>
       <div class="content">

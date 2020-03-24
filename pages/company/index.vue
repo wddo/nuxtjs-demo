@@ -13,7 +13,7 @@ export default {
     //dom에 바인딩 되어있는 data 변경 시 실행 주의
     console.log("render")
     return h("div", [
-      this.msg,
+      `render page : ${this.msg}`,
       h(
         "button",
         {
@@ -27,10 +27,10 @@ export default {
     ])
   },
   mounted() {
-    console.log("mounted")
+    console.log("mounted /company")
   },
   updated() {
-    console.log("updated")
+    console.log("updated /company")
   },
   methods: {
     clickHandler() {

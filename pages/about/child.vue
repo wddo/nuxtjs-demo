@@ -1,19 +1,11 @@
 <template>
   <div class="child_wrap">
-    my child component!
+    nuxt-child 태그에 의한 about/child
   </div>
 </template>
 
 <script>
-import store from "~/store" // 부모것과 공유 되지 않는다 ㅠ
-
 export default {
-  mixins: [store],
-  mounted() {
-    console.log(this.msg)
-    this.msg = "child"
-    console.log(this.msg)
-  }
 }
 </script>
 

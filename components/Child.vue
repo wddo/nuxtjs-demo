@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <h2 :style="myStyle">child</h2>
+      <h2>Child</h2>
       <button @click="btnHandler">{{ this.msg }}</button>
     </div>
   </div>
@@ -12,9 +12,6 @@ export default {
   name: "Child",
   data() {
     return {
-      myStyle: {
-        marginTop: "10px"
-      },
       msg: "im button"
     }
   },
@@ -24,24 +21,22 @@ export default {
     }
   },
   beforeCreate() {
-    console.log(`beforeCreate : child`)
+    console.log("beforeCreate /mycomponent > child")
   },
   created() {
-    console.log(`created : child`)
-    //console.log("msg : ", this.msg);
+    console.log("created /mycomponent > child")
   },
   beforeMount() {
-    console.log(`beforeMount : child`)
-    //console.log("el : ", this.$el);
+    console.log("beforeMount /mycomponent > child")
   },
   mounted() {
-    console.log(`mounted : child`)
+    console.log("mounted /mycomponent > child")
   },
   beforeUpdate() {
-    console.log("beforeUpdate : child /" /* , this.msg */)
+    console.log("beforeUpdate /mycomponent > child" /* , this.msg */)
   },
   updated() {
-    console.log("updated : child /" /* , this.msg */)
+    console.log("updated /mycomponent > child" /* , this.msg */)
   }
 }
 </script>

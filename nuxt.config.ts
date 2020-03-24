@@ -39,7 +39,7 @@ const config: any = {
       src: "~plugins/global.js"
     }
   ],
-  buildModules: ["@nuxt/typescript-build"],
+  buildModules: ['@nuxt/typescript-build'],
   build: {
     /*  vendor: ['external_library'], */
     /*

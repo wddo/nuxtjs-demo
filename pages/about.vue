@@ -4,12 +4,9 @@
     <h1>about</h1>
     <ul>
       <li><router-link to="/"> go index </router-link></li>
-      <li><router-link to="/aaa"> go aaa </router-link></li>
+      <li><router-link to="/about/child"> go about child </router-link></li>
+      <li><router-link to="/empty"> go empty </router-link></li>
     </ul>
-    <hr />
-
-    {{ this.msg }}
-
     <hr />
     <button @click.prevent="toggleClick">toggle</button>
     <div class="toggle" v-show="showToggle">
@@ -21,40 +18,36 @@
 </template>
 
 <script>
-import store from "~/store"
-
 export default {
-  mixins: [store],
   data() {
     return {
-      msg: "",
       showToggle: true
-    }
+    };
   },
   methods: {
     toggleClick() {
-      this.showToggle = !this.showToggle
+      this.showToggle = !this.showToggle;
     }
   },
   layout: "dark",
   head() {
     return {
-      title: "소개11111",
+      title: "dark mode",
       script: [
         {
-          src: "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"
+          src:
+            "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"
         }
       ]
-    }
+    };
+  },
+  created() {
+    console.log("created /about");
   },
   mounted() {
-    setTimeout(() => {
-      console.log(this.msg)
-      this.msg = "about"
-      console.log(this.msg)
-    }, 2000)
+    console.log("mounted /about");
   }
-}
+};
 </script>
 
 <style scoped>

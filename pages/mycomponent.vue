@@ -2,7 +2,6 @@
   <div>
     <h1>my component</h1>
     <Child></Child>
-    <button v-focus>directive</button>
   </div>
 </template>
 
@@ -14,9 +13,6 @@ const focus = Vue.directive("focus")
 
 export default {
   components: { Child },
-  directives: {
-    focus
-  },
   beforeCreate() {
     console.log(`beforeCreate : mycomponent`)
   },
