@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="sub_container">
     <div><button @click.prevent="goBack">go back</button></div>
     <h1>about</h1>
     <ul>
@@ -29,18 +29,6 @@ export default {
       this.showToggle = !this.showToggle;
     }
   },
-  layout: "dark",
-  head() {
-    return {
-      title: "dark mode",
-      script: [
-        {
-          src:
-            "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"
-        }
-      ]
-    };
-  },
   created() {
     console.log("created /about");
   },
@@ -51,9 +39,9 @@ export default {
 </script>
 
 <style scoped>
-div.toggle {
-  background-color: yellowgreen;
-  width: 100px;
-  height: 100px;
-}
+  div.toggle {
+    background-color: yellowgreen;
+    width: 100px;
+    height: 100px;
+  }
 </style>

@@ -14,11 +14,18 @@
       </div>
       <ul>
         <li><router-link to="./about">go about</router-link></li>
-        <li><router-link to="./company">go my company</router-link></li>
         <li><router-link to="./mycomponent">go my component</router-link></li>
       </ul>
       <div class="content">
-        content
+        content<br />
+        content<br />
+        content<br />
+        content<br />
+        content<br />
+        content<br />
+        content<br />
+        content<br />
+
       </div>
     </div>
   </section>
@@ -36,14 +43,6 @@ export default {
 </script>
 
 <style>
-a {
-  text-decoration: none;
-}
-
-ul {
-  list-style: none;
-}
-
 .container {
   min-height: 100vh;
   display: flex;
