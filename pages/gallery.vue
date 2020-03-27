@@ -1,13 +1,9 @@
 <template>
   <div>
     <h1>gallery</h1>
-    <div class="gallery_container">
-      <div class="navigation" v-if="type === 'pc'">
-        <a href="#" class="prev" @click.prevent="naviHandler($event)">&lt;</a>
-        <a href="#" class="next" @click.prevent="naviHandler($event)">&gt;</a>
-      </div>
+    <div :class="['gallery_container', type]">
       <div
-        class="swiper-container swiper-top"
+        class="swiper-container gallery-top"
         ref="swiperTop"
         v-swiper="type === 'pc' ? swiperTopPcOptions : swiperTopOptions"
       >
@@ -17,13 +13,13 @@
           </a>
         </div>
         <div class="swiper-pagination"></div>
-      </div>
-      <div class="navigation thumbs" v-if="type === 'pc'">
-        <a href="#" class="prev" @click.prevent="thumbNaviHandler($event)">&lt;</a>
-        <a href="#" class="next" @click.prevent="thumbNaviHandler($event)">&gt;</a>
+        <div class="navigation" v-if="type === 'pc'">
+          <a href="#" class="prev">&lt;</a>
+          <a href="#" class="next">&gt;</a>
+        </div>
       </div>
       <div
-        :class="['swiper-container', 'swiper-thumbs', type]"
+        class="swiper-container gallery-thumbs"
         ref="swiperThumbs"
         v-swiper="type === 'pc' ? swiperThumbsPcOptions : swiperThumbsOptions"
       >
@@ -31,6 +27,11 @@
           <a href="#" class="swiper-slide" v-for="(item, idx) in list" :key="idx">
             <img :src="item.src" />
           </a>
+        </div>
+
+        <div class="navigation thumbs" v-if="type === 'pc'">
+          <a href="#" class="prev">&lt;</a>
+          <a href="#" class="next">&gt;</a>
         </div>
       </div>
     </div>
@@ -48,7 +49,7 @@ vbas
 export default {
   data() {
     return {
-      type: "pc",
+      type: process.client && typeof window.ontouchstart !== 'undefined' ? 'mobile' : 'pc',
       list: [],
       oriList: [
         { name: "slide1", src: "http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg" },
@@ -83,6 +84,8 @@ export default {
       swiperThumbsPcOptions: {
         slidesPerView: "auto",
         slidesPerGroup: 4,
+        slidesOffsetBefore: 20,
+        slidesOffsetAfter: 20,
         watchSlidesVisibility: true,
         watchSlidesProgress: true,
         slideToClickedSlide: true
@@ -116,51 +119,6 @@ export default {
       this.$nextTick(() => {
         this.$fx.swiper.resetGallery(this)
       })
-    },
-    naviHandler(e) {
-      const target = e.currentTarget
-      const topSwiper = this.$refs.swiperTop.swiper
-      const thumbsSwiper = topSwiper.thumbs.swiper
-
-      if (!topSwiper || !thumbsSwiper) return
-
-      if (_.indexOf(target.classList, "prev") >= 0) {
-        topSwiper.slidePrev()
-      } else {
-        topSwiper.slideNext()
-      }
-      thumbsSwiper.slideTo(topSwiper.realIndex)
-    },
-    thumbNaviHandler(e) {
-      const target = e.currentTarget
-      const topSwiper = this.$refs.swiperTop.swiper
-      const thumbsSwiper = topSwiper.thumbs.swiper
-
-      if (!topSwiper || !thumbsSwiper) return
-
-      const currentIdx = thumbsSwiper.realIndex
-      const totalIdx = thumbsSwiper.slides.length - 1
-      const groupNum = thumbsSwiper.params.slidesPerGroup
-
-      let goIdx
-      let n = groupNum
-      if (_.indexOf(target.classList, "prev") >= 0) {
-        const toIdx = currentIdx //prev 때는 realIndex 가 목적지 idx
-        const isMiddle = toIdx % totalIdx > 0 && toIdx > groupNum //배수가 아니고 첫 페이지보다 크면
-        goIdx = Math.max(0, !isMiddle ? toIdx - groupNum : toIdx)
-
-        while (n--) {
-          topSwiper.slidePrev()
-        }
-      } else {
-        goIdx = Math.min(totalIdx, currentIdx + groupNum)
-
-        while (n--) {
-          topSwiper.slideNext()
-        }
-      }
-
-      thumbsSwiper.slideTo(goIdx)
     }
   }
 }
@@ -176,12 +134,14 @@ export default {
 
 .navigation {
   position: absolute;
+  top: 0;
   left: 0;
   z-index: 10;
   height: 50vh;
   width: 100%;
   display: flex;
-  padding: 0 10px;
+  font-family: serif;
+  font-weight: bold;
 }
 
 .navigation a {
@@ -189,22 +149,30 @@ export default {
   height: 100%;
   position: relative;
   flex: 1 1 auto;
-  text-align: center;
+  text-align: left;
   font-size: 10rem;
-  line-height: 45vh;
+  line-height: 50vh;
+  opacity: 0;
+}
+.navigation a:last-child {
+  text-align: right;
+}
+.navigation a:hover {
   opacity: 0.4;
 }
 
 .navigation.thumbs {
-  height: 40px;
+  padding: 0;
+  height: 50px;
 }
 
 .navigation.thumbs a {
   font-size: 2rem;
   line-height: 2rem;
+  z-index: 1;
 }
 
-.swiper-top {
+.gallery-top {
   height: 50vh;
 }
 
@@ -219,31 +187,22 @@ export default {
   object-fit: cover;
 }
 
-.swiper-top .swiper-slide {
+.gallery-top .swiper-slide {
   display: inline-block;
   background-color: gray;
 }
 
-.swiper-thumbs {
+.gallery-thumbs {
   height: 50px;
   margin-top: 40px;
 }
 
-.swiper-thumbs .swiper-slide {
+.gallery-thumbs .swiper-slide {
   display: inline-block;
   background-color: pink;
 }
 
-.swiper-thumbs.pc .swiper-slide {
-  width: 85.75px;
-  margin-right: 4px;
-}
-
-.swiper-thumbs.pc .swiper-slide:nth-last-child(1) {
-  margin-right: 0;
-}
-
-.swiper-thumbs .swiper-slide.swiper-slide-thumb-active:after {
+.gallery-thumbs .swiper-slide.swiper-slide-thumb-active:after {
   content: "";
   position: absolute;
   display: inline-block;
@@ -280,4 +239,37 @@ export default {
   display: inline-block;
   width: 100%;
 }
+
+.pc {
+  width: 485px;
+}
+
+.pc .gallery-thumbs .swiper-slide {
+  width: 85.75px;
+  margin-right: 4px;
+}
+
+.pc .gallery-thumbs .swiper-slide:nth-last-child(1) {
+  margin-right: 0;
+}
+
+.pc .gallery-thumbs .navigation.thumbs {
+  display: block;
+}
+
+.pc .gallery-thumbs .navigation.thumbs a {
+  position: absolute;
+  flex: none;
+  display: block;
+  width: 20px;
+  height: 50px;
+  background-color: #fff;
+  opacity: 1;
+  line-height: 50px;
+}
+
+.pc .gallery-thumbs .navigation.thumbs a:last-child {
+  right: 0;
+}
+
 </style>

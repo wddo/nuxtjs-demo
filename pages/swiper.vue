@@ -26,6 +26,7 @@
         <div class="swiper-pagination"></div>
       </div>
     </div>
+    <div>{{num}}</div>
   </div>
 </template>
 
@@ -33,7 +34,8 @@
 export default {
   data() {
     return {
-      isShowNum: 1,
+      num: 0,
+      isShowNum: 0,
       toggle: true,
       list: [],
       msg: "",
@@ -56,21 +58,26 @@ export default {
         pagination: {
           el: ".swiper-pagination",
           type: "fraction"
+        },
+        exChange : (swiper, type, {idx, max}) => {
+          //console.log(this)
+          this.num = idx
         }
       }
     }
   },
   created() {
-    console.log("!!!!! created")
+    console.log("!!!!! swiper.vue / created")
   },
   mounted() {
-    console.log("!!!!! mounted")
+    console.log("!!!!! swiper.vue / mounted")
+    this.$eventBus.$emit(this.EVENT.TRACE, "loading...")
     setTimeout(() => {
       this.list = [{ name: "item1" }, { name: "item2" }, { name: "item3" }, { name: "item4" }]
 
-      this.isShowNum = 1
+      this.isShowNum = 2
       this.$eventBus.$emit(this.EVENT.TRACE, "add item")
-    }, 500)
+    }, 2000)
 
     /*
     setTimeout(() => {

@@ -16,7 +16,7 @@ export default {
       isShow: false
     }
   },
-  mounted() {
+  beforeMount() {
     this.$eventBus.$on(this.EVENT.TRACE, this.trace)
   },
   methods: {
@@ -32,6 +32,9 @@ export default {
 .bottomArea {
   position: absolute;
   bottom: 0;
+  width: 100vw;
+  background-color: #ccc;
+  padding-bottom: 2rem;
 }
 
 #trace {
