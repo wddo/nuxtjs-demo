@@ -52,19 +52,19 @@ export default {
       type: process.client && typeof window.ontouchstart !== 'undefined' ? 'mobile' : 'pc',
       list: [],
       oriList: [
-        { name: "slide1", src: "http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg" },
-        { name: "slide2", src: "http://image1.hanatour.com/_images/main/md/banner_298.jpg" },
-        { name: "slide3", src: "http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg" },
-        { name: "slide4", src: "http://image1.hanatour.com/_images/main/md/banner_298.jpg" },
-        { name: "slide5", src: "http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg" },
-        { name: "slide6", src: "http://image1.hanatour.com/_images/main/md/banner_298.jpg" },
-        { name: "slide7", src: "http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg" },
-        { name: "slide8", src: "http://image1.hanatour.com/_images/main/md/banner_298.jpg" },
-        { name: "slide9", src: "http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg" },
-        { name: "slide10", src: "http://image1.hanatour.com/_images/main/md/banner_298.jpg" }
+        { name: 'slide1', src: 'http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg' },
+        { name: 'slide2', src: 'http://image1.hanatour.com/_images/main/md/banner_298.jpg' },
+        { name: 'slide3', src: 'http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg' },
+        { name: 'slide4', src: 'http://image1.hanatour.com/_images/main/md/banner_298.jpg' },
+        { name: 'slide5', src: 'http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg' },
+        { name: 'slide6', src: 'http://image1.hanatour.com/_images/main/md/banner_298.jpg' },
+        { name: 'slide7', src: 'http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg' },
+        { name: 'slide8', src: 'http://image1.hanatour.com/_images/main/md/banner_298.jpg' },
+        { name: 'slide9', src: 'http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg' },
+        { name: 'slide10', src: 'http://image1.hanatour.com/_images/main/md/banner_298.jpg' }
       ],
       swiperTopOptions: {
-        effect: "fade",
+        effect: 'fade',
         loop: true,
         loopedSlides: 5
       },
@@ -79,10 +79,10 @@ export default {
       },
       /** type === pc */
       swiperTopPcOptions: {
-        effect: "fade"
+        effect: 'fade'
       },
       swiperThumbsPcOptions: {
-        slidesPerView: "auto",
+        slidesPerView: 'auto',
         slidesPerGroup: 4,
         slidesOffsetBefore: 20,
         slidesOffsetAfter: 20,
@@ -93,7 +93,7 @@ export default {
     }
   },
   mounted() {
-    console.log("!!!!! mounted")
+    console.log('!!!!! mounted')
 
     this.list = _.take(this.oriList, this.oriList.length)
 
@@ -104,16 +104,16 @@ export default {
   methods: {
     categoryHandler(val) {
       switch (val) {
-        case "all":
-          this.list = _.take(this.oriList, this.oriList.length)
-          break
-        case "room":
-          this.list = _.take(this.oriList, 4)
-          break
-        case "outdoor":
-          this.list = _.takeRight(this.oriList, 6)
-          break
-        default:
+      case 'all':
+        this.list = _.take(this.oriList, this.oriList.length)
+        break
+      case 'room':
+        this.list = _.take(this.oriList, 4)
+        break
+      case 'outdoor':
+        this.list = _.takeRight(this.oriList, 6)
+        break
+      default:
       }
 
       this.$nextTick(() => {

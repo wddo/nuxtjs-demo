@@ -6,7 +6,7 @@
       <button class="tabBtn" @click="clickHandler(2)">show 2</button>
       <button class="tabBtn" @click="clickHandler(0)">toggle : {{ this.toggle }}</button>
     </div>
-    <div v-show="isShowNum === 1 || (toggle && !isShowNum)">
+    <!--div v-show="isShowNum === 1 || (toggle && !isShowNum)">
       <h3>swiper 1</h3>
       <div v-swiper="swiperOptions" @transitionEnd="onTransitionEnd" class="swiper-container myswiper1">
         <div class="swiper-wrapper">
@@ -16,7 +16,7 @@
         </div>
         <div class="swiper-pagination"></div>
       </div>
-    </div>
+    </div-->
     <div v-show="isShowNum === 2 || (toggle && !isShowNum)">
       <h3>swiper 2</h3>
       <div v-swiper="swiperOptions2" class="swiper-container myswiper2">
@@ -26,7 +26,7 @@
         <div class="swiper-pagination"></div>
       </div>
     </div>
-    <div>{{num}}</div>
+    <div>{{ num }}</div>
   </div>
 </template>
 
@@ -38,17 +38,17 @@ export default {
       isShowNum: 0,
       toggle: true,
       list: [],
-      msg: "",
+      msg: '',
       swiperOptions: {
         loop: true,
         spaceBetween: 10,
         pagination: {
-          el: ".swiper-pagination",
-          type: "fraction"
+          el: '.swiper-pagination',
+          type: 'fraction'
         },
         on: {
           transitionEnd: function() {
-            console.log("transitionEnd 11111")
+            console.log('transitionEnd 11111')
           }
         }
       },
@@ -56,28 +56,34 @@ export default {
         loop: true,
         spaceBetween: 10,
         pagination: {
-          el: ".swiper-pagination",
-          type: "fraction"
+          el: '.swiper-pagination',
+          type: 'fraction'
         },
-        exChange : (swiper, type, {idx, max}) => {
-          //console.log(this)
+        on: {
+          slideChangeTransitionEnd: function() {
+            console.log('slideChangeTransitionEnd')
+          }
+        },
+        exChange: (swiper, type, { idx, max }) => {
+          // console.log(this)
           this.num = idx
         }
       }
     }
   },
   created() {
-    console.log("!!!!! swiper.vue / created")
+    console.log('!!!!! swiper.vue / created')
   },
   mounted() {
-    console.log("!!!!! swiper.vue / mounted")
-    this.$eventBus.$emit(this.EVENT.TRACE, "loading...")
+    console.log('!!!!! swiper.vue / mounted')
+    this.$eventBus.$emit(this.EVENT.TRACE, 'loading...')
     setTimeout(() => {
-      this.list = [{ name: "item1" }, { name: "item2" }, { name: "item3" }, { name: "item4" }]
+      this.list = [{ name: 'item1' }, { name: 'item2' }, { name: 'item3' }, { name: 'item4' }]
 
       this.isShowNum = 2
-      this.$eventBus.$emit(this.EVENT.TRACE, "add item")
-    }, 2000)
+      this.$eventBus.$emit(this.EVENT.TRACE, 'add item')
+      // }, 2000)
+    }, 300)
 
     /*
     setTimeout(() => {
@@ -93,7 +99,7 @@ export default {
       if (!n) this.toggle = !this.toggle
     },
     onTransitionEnd() {
-      console.log("transitionEnd 22222")
+      console.log('transitionEnd 22222')
     },
     slideClick(link) {
       if (link) this.$router.push(link)

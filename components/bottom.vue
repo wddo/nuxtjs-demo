@@ -9,10 +9,10 @@
 
 <script>
 export default {
-  name: "bottom",
+  name: 'bottom',
   data() {
     return {
-      msg: "",
+      msg: '',
       isShow: false
     }
   },

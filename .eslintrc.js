@@ -17,5 +17,10 @@ module.exports = {
     'vue'
   ],
   // add your custom rules here
-  rules: {}
+  rules: {
+    'semi': ['error', 'never'],
+    'quotes': ['error', 'single'],
+    'spaced-comment': ['error', 'always'],
+    'indent': ['error', 2]
+  }
 }

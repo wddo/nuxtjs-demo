@@ -1,12 +1,12 @@
-import Vue from "vue"
-import { eventBus, EVENT } from "~/plugins/events/eventBus"
-import vswiper from "~/plugins/directives/vswiper"
-import _ from "lodash"
+import Vue from 'vue'
+import { eventBus, EVENT } from '~/plugins/events/eventBus'
+import vswiper from '~/plugins/directives/vswiper'
+import _ from 'lodash'
 
 Vue.prototype.$eventBus = eventBus
 Vue.prototype.EVENT = EVENT
 
-Vue.directive("swiper", vswiper)
+Vue.directive('swiper', vswiper)
 
 Vue.prototype.$fx = {
   swiper: {
@@ -26,35 +26,35 @@ Vue.prototype.$fx = {
       const opts = _.merge(
         {},
         {
-          container: _.get(target, "$el", target),
-          selector: "",
-          eventName: "reset"
+          container: _.get(target, '$el', target),
+          selector: '',
+          eventName: 'reset'
         },
         options
       )
 
-      //update 상태에서 Observer 지원하면 실행 안함
-      if (opts.eventName === "update" && $nuxt.$fx.isObserverSupport) return
+      // update 상태에서 Observer 지원하면 실행 안함
+      if (opts.eventName === 'update' && $nuxt.$fx.isObserverSupport) return
 
-      const container = _.get(opts.container, "$el", opts.container) //refs 일수도 있으니 체크
+      const container = _.get(opts.container, '$el', opts.container) // refs 일수도 있으니 체크
 
-      if (_.isNil(_.result(container, "classList"))) return //내용이 dom 이 아니면 정지
+      if (_.isNil(_.result(container, 'classList'))) return // 내용이 dom 이 아니면 정지
 
       const swipers =
-        _.indexOf(_.result(container, "classList"), "swiper-container") >= 0 //자신이 swiper-container 면
-          ? [container] //자식을 배열로
-          : container.querySelectorAll(`.swiper-container${opts.selector}`) //아니면 자식에서 찾기
+        _.indexOf(_.result(container, 'classList'), 'swiper-container') >= 0 // 자신이 swiper-container 면
+          ? [container] // 자식을 배열로
+          : container.querySelectorAll(`.swiper-container${opts.selector}`) // 아니면 자식에서 찾기
 
       let elm
       let swiperIns
       _.map(swipers, item => {
-        elm = _.get(item, "__vue__.$el", item)
+        elm = _.get(item, '__vue__.$el', item)
 
         swiperIns = elm.swiper
 
         if (swiperIns) {
-          //swiperIns.options = _.merge({}, swiperIns.options, opts)
-          if (_.isNil(_.result(swiperIns, "options"))) swiperIns.options = opts //vSwiper2 에서 활용 용도로 옵션 저장
+          // swiperIns.options = _.merge({}, swiperIns.options, opts)
+          if (_.isNil(_.result(swiperIns, 'options'))) swiperIns.options = opts // vSwiper2 에서 활용 용도로 옵션 저장
 
           swiperIns.el.dispatchEvent(new CustomEvent(opts.eventName))
         }
@@ -68,7 +68,7 @@ Vue.prototype.$fx = {
      * @property {Element} options.all - 갤러리 top, thumbs 모두 리셋 할지 유무
      */
     resetGallery(target, options) {
-      const resetThumbs = _.defaultTo(_.get(options, "all"), false)
+      const resetThumbs = _.defaultTo(_.get(options, 'all'), false)
 
       if (target.$refs.swiperTop && target.$refs.swiperThumbs) {
         if (resetThumbs) $nuxt.$fx.swiper.reset(target.$refs.swiperThumbs)
@@ -76,11 +76,11 @@ Vue.prototype.$fx = {
           thumbs: { swiper: target.$refs.swiperThumbs.swiper }
         })
 
-        //thumbs에 top정보 정의
+        // thumbs에 top정보 정의
         if (target.$refs.swiperThumbs.swiper)
           _.set(
             target.$refs.swiperThumbs.swiper,
-            "top.swiper",
+            'top.swiper',
             target.$refs.swiperTop.swiper
           )
       }

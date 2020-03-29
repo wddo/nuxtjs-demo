@@ -9,7 +9,7 @@
 
 <script>
 export default {
-  name: "headerLnb"
+  name: 'headerLnb'
 }
 </script>
 

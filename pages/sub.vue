@@ -7,10 +7,10 @@
 <script>
 export default {
   created() {
-    console.log("sub created")
+    console.log('sub created')
   },
   mounted() {
-    console.log("sub mounted")
+    console.log('sub mounted')
   }
 }
 </script>

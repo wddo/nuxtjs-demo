@@ -7,8 +7,8 @@
 </template>
 
 <script>
-import headerLnb from "~/components/headerLnb"
-import bottom from "~/components/bottom"
+import headerLnb from '~/components/headerLnb'
+import bottom from '~/components/bottom'
 
 export default {
   components: {

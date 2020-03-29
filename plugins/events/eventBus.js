@@ -1,7 +1,7 @@
-import Vue from "vue"
+import Vue from 'vue'
 
 export const EVENT = {
-  TRACE: "trace"
+  TRACE: 'trace'
 }
 
 Vue.EventBus = null
