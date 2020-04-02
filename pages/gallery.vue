@@ -255,6 +255,7 @@ export default {
 
 .pc .gallery-thumbs .navigation.thumbs {
   display: block;
+  z-index: auto;
 }
 
 .pc .gallery-thumbs .navigation.thumbs a {

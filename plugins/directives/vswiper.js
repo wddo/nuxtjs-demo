@@ -7,10 +7,10 @@ const CHANGE_EVENTS = [
 
 export default {
   bind(el, binding, vnode) {
+    console.log('!!!!! bind', _.join(el.classList, ', '))
+
     initSwiper(el, binding, vnode)
     initEvent(el, vnode)
-
-    console.log('!!!!! bind', _.join(el.classList, ', '))
 
     el.addEventListener('update', function(e) {
       const swiper = e.target.swiper
@@ -29,16 +29,35 @@ export default {
     })
   },
   componentUpdated(el, binding, vnode, oldVnode) {
-    resetSwiper(el, binding, vnode)
+    // resetSwiper(el, binding, vnode)
 
     console.log('!!!!! componentUpdated', _.join(el.classList, ', ')/* , binding, vnode */)
 
-    /* if (el.swiper) {
-      el.swiper.update()
-      if (el.swiper.pagination) el.swiper.pagination.init()
-    } */
+    if (el.swiper) {
+      const swiper = el.swiper
+
+      if (swiper.params.loop) el.swiper.loopDestroy() // 복제 slide 삭제
+
+      // 초기 options 받아 instance의 params와 병합하여 하여 initSwiper > importantOptions 의해 변경된 options 복구
+      _.merge(swiper.params, importantOptions(el, swiper.defaultOptions, vnode))
+
+      if (swiper.pagination) el.swiper.pagination.init()  // 페이징 초기화
+      if (swiper.params.loop) el.swiper.loopCreate()      // 복제 slide 생성
+
+      swiper.update() // updateSize(), updateSlides(), updateProgress(), updateSlidesClasses()
+
+      afterModifySwiper(swiper) // 레이아웃 재정의
+      initGallery(el)
+      fixObjectfit(el)
+
+      if (swiper.realIndex !== getPageInfo(swiper).idx) { // realIndex속성과 실제idx가 다르면 내부 loopCreate()로 인한 paging 어그러진것으로 판단
+        const idx = swiper.params.initialSlide + (swiper.params.loop) ? swiper.loopedSlides : 0
+        swiper.slideTo(idx, 0) // 맨앞으로 초기화
+      }
+    }
   },
-  unbind: function(el, binding, vnode) {
+  unbind(el, binding, vnode) {
+    console.log('!!!!! unbind / ', _.join(el.classList, ', '))
     deleteSwiper(el, binding, vnode)
   }
 }
@@ -52,10 +71,12 @@ function getDefaultOptions(el, vnode) {
     on: {
       observerUpdate: function(e) {
         if (e.type === 'attributes' && _.indexOf(e.target.classList, 'page-enter-active') >= 0) {
+          console.log('observerUpdate reset')
           this.el.dispatchEvent(new CustomEvent('reset')) // history back 대응
         }
 
         if (e.type === 'childList' && _.indexOf(e.target.classList, 'swiper-container') >= 0) {
+          console.log('observerUpdate onChange(init)')
           if (!_.isNil(_.result(e.target, 'swiper'))) onChange(e.target.swiper, 'init') // init 대신
         }
       },
@@ -90,6 +111,7 @@ function getDefaultOptions(el, vnode) {
 
 // swiper 삭제
 function deleteSwiper(el, binding, vnode) {
+  console.log('!!!!! deleteSwiper / ', _.join(el.classList, ', '))
   const swiper = el.swiper
 
   if (_.isNil(swiper)) return
@@ -104,9 +126,10 @@ function initSwiper(el, binding, vnode) {
     getDefaultOptions(el, vnode),
     binding.value)
 
-  _.merge(swiperOptions, importantOptions(el, swiperOptions, vnode))
+  const opts = _.merge({}, swiperOptions, importantOptions(el, swiperOptions, vnode))
 
-  const swiper = new Swiper(el, swiperOptions)
+  const swiper = new Swiper(el, opts)
+  swiper.defaultOptions = swiperOptions // componentUpdated 활용할 기본 options
 
   if (!_.isNil(swiper)) afterModifySwiper(swiper)
 
@@ -186,8 +209,8 @@ function initGallery(el) {
 
 // 초기화 전 optons 가공용
 function importantOptions(el, options, vnode) {
-  const slideLength = el.querySelectorAll('.swiper-slide').length
-  const slidePerView = options.slidesPerView
+  const slideLength = getSlideLength(el)
+  const slidePerView = options.slidesPerView || 1
   const isOneSlide = slidePerView !== 'auto' && slideLength <= slidePerView // 초기화 되기전 slide 갯수 1개 이거나
   // const isCalendar = _.indexOf(el.classList, 'calendar_wrap') >= 0 //달력에 autoplay가 필요한지 모르겠음
 
@@ -204,30 +227,30 @@ function importantOptions(el, options, vnode) {
     _.set(returnObject, 'autoplay.disableOnInteraction', false) // autoplay가 true 경우도 {} 화되면 true 로 인정
   }
 
+  console.log('@@@@@ importantOptions() / isOneSlide', isOneSlide, returnObject)
+
   return returnObject
 }
 
 // 추가 swiper layout 로직
-function afterModifySwiper(swiper, device) {
+function afterModifySwiper(swiper) {
   const container = swiper.el
-  const slideLength = swiper.slides.length
+  const slideLength = getSlideLength(swiper.el) // xxx
   const slidePerView = swiper.params.slidesPerView
-  const isOneSlide = (!swiper.params.loop && // loop:false 시 (loop:true 면 기본 swiper.slides 3개)
-                      (slidePerView !== 'auto' && slideLength <= slidePerView)) // 실제 .swiper-slide 가 보여지는 갯수보다 같거나 작으면
+  const isOneSlide = ((slidePerView !== 'auto' && slideLength <= slidePerView)) // 실제 .swiper-slide 가 보여지는 갯수보다 같거나 작으면
   const isCalendar = _.indexOf(swiper.el.classList, 'calendar_wrap') >= 0
+
+  console.log('@@@@@ afterModifySwiper() / slides.length', swiper.slides.length, 'getSlideLength', slideLength)
 
   if (!_.isNil(_.result(swiper, 'pagination.el')) && !isCalendar) {
     const pageElm = swiper.pagination.el
-    // const isContoller = _.indexOf(pageElm.parentElement.classList, 'control') >= 0  //부모가 .control 묶음이면
     const isContoller = !_.isNil(container.querySelector('.control')) // swiper-container 내 .control 묶음있으면 (모바일 대응)
-    // const pagination = isContoller ? pageElm.parentElement : pageElm //대상을 부모로 //아니면 자신
     const pagination = isContoller ? container.querySelector('.control') : pageElm // .control //아니면 자신
 
     pagination.style.visibility = isOneSlide ? 'hidden' : 'visible' // 페이징이나 컨트롤러 숨기거나 보이기
     if (!_.isNil(container.querySelector('.total'))) container.querySelector('.total').style.visibility = pagination.style.visibility
 
     if (isContoller) { // 재생 & 정지 버튼 로직
-      // const playBtn = pageElm.parentElement.querySelector('.btn_cntrl')
       const playBtn = container.querySelector('.control .btn_cntrl')
       const prevBtn = _.result(swiper, 'navigation.prevEl')
       const nextBtn = _.result(swiper, 'navigation.nextEl')
@@ -244,23 +267,6 @@ function afterModifySwiper(swiper, device) {
         nextBtn.addEventListener('click', prevNextBtnHandler)
       }
     }
-  }
-  /* swiper.el.style.pointerEvents = isOneSlide ? 'none' : ''
-  swiper.wrapperEl.style.pointerEvents = isOneSlide ? 'none' : ''
-  _.forEach(swiper.slides, item => item.style.pointerEvents = isOneSlide ? 'none' : '') */
-
-  switch(device) {
-  case 'pc' :
-    // .swiper-slide 속에 a 태그 없으면 커서 pointer 로
-    _(_.filter(swiper.slides, item => _.isNil(item.querySelector('a')))).valueOf().map(item => {
-      item.style.cursor = 'pointer'
-    })
-
-    break
-  case 'mobile' :
-    //
-    break
-  default :
   }
 }
 
@@ -312,12 +318,34 @@ function initEvent(el, vnode) {
   })
 }
 
+// 복제 제외한 슬라이드 갯수 반환
+function getSlideLength(el) {
+  return _.filter(el.querySelectorAll('.swiper-slide'), item => _.indexOf(item.classList, 'swiper-slide-duplicate') < 0).length
+}
+
+// 페이징 정보 반환
+function getPageInfo(swiper) {
+  let idx = 0
+
+  // if (_.indexOf(_.get(swiper.pagination, 'el.classList'), 'swiper-pagination-bullets') >= 0) {
+  // max = swiper.pagination.bullets.length || 1
+  // idx = _.findIndex(swiper.pagination.bullets, (item, idx) => _.indexOf(item.classList, 'swiper-pagination-bullet-active') >= 0) || 0
+  // } else {
+  const max = getSlideLength(swiper.el) || 1
+
+  const activeSlideElm = _(_.filter(swiper.slides, item => _.indexOf(item.classList, 'swiper-slide-active') >= 0)).chain().head().valueOf()
+
+  if (!_.isNil(activeSlideElm)) {
+    const idxAttr = parseInt(activeSlideElm.getAttribute('data-swiper-slide-index'))
+    if (!_.isNaN(idxAttr)) idx = idxAttr
+  }
+  // }
+  return {idx, max}
+}
+
 function onChange(swiper, type) {
+  // console.log('onChange : ', type)
   const container = swiper.el
-  const pagination = swiper.pagination
-  const pageElm = pagination.el
-  let max
-  let idx
 
   // 복제 slide @click.prevnet 대응
   if (type === 'init') {
@@ -333,50 +361,32 @@ function onChange(swiper, type) {
     })
   }
 
-  if (!_.isNil(_.result(pagination, 'el'))) {
-    if (_.indexOf(pageElm.classList, 'swiper-pagination-bullets') >= 0) {
-      max = pagination.bullets.length || 1
-      idx = _.findIndex(pagination.bullets, (item, idx) => _.indexOf(item.classList, 'swiper-pagination-bullet-active') >= 0) || 0
-    } else {
-      max = _.filter(swiper.slides, (item, idx) => _.indexOf(item.classList, 'swiper-slide-duplicate') < 0).length || 1
-      idx = 0
+  const pageInfo = getPageInfo(swiper)
 
-      const activeSlideElm = _(_.filter(swiper.slides, (item, idx) => _.indexOf(item.classList, 'swiper-slide-active') >= 0)).chain().head().valueOf()
+  // .total 부분 페이징
+  const totalElm = container.querySelector('.total')
+  if (!_.isNil(totalElm)) {
+    const suffix = _.indexOf(totalElm.classList, 'space') >= 0 ? ' / ' : '/'
+    totalElm.innerHTML = '<span>' + (pageInfo.idx + 1) + '</span>' + suffix + '<span>' + pageInfo.max + '</span>'
+  }
 
-      if (!_.isNil(activeSlideElm)) {
-        const idxAttr = parseInt(activeSlideElm.getAttribute('data-swiper-slide-index')) || swiper.realIndex
-        if (!_.isNaN(idxAttr)) idx = idxAttr
-      }
-    }
+  // observerUpdate에 의한 재초기화 시 autoplay 설정되어 있다면 play
+  if (type === 'init' && _.get(swiper, 'defaultOptions.autoplay') === true || !_.isNaN(parseInt(_.get(swiper, 'defaultOptions.autoplay.delay')))) {
+    swiper.autoplay.start()
+  }
 
-    // .total 부분 페이징
-    const totalElm = container.querySelector('.total')
-    if (!_.isNil(totalElm)) {
-      const suffix = _.indexOf(totalElm.classList, 'space') >= 0 ? ' / ' : '/'
-      totalElm.innerHTML = '<span>' + (idx + 1) + '</span>' + suffix + '<span>' + max + '</span>'
-    }
+  // const isContoller = _.indexOf(pageElm.parentElement.classList, 'control') >= 0  //부모가 .control 묶음이면
+  const isContoller = !_.isNil(container.querySelector('.control')) // swiper-container 내 .control 묶음있으면 (모바일 대응)
+  if (isContoller) {
+    const playBtn = container.querySelector('.control .btn_cntrl')
 
-    // type fraction 는 조작없이 동작하여 제외
-    if (_.indexOf(pageElm.classList, 'swiper-pagination-fraction') >= 0) {}
-
-    // const isContoller = _.indexOf(pageElm.parentElement.classList, 'control') >= 0  //부모가 .control 묶음이면
-    const isContoller = !_.isNil(container.querySelector('.control')) // swiper-container 내 .control 묶음있으면 (모바일 대응)
-    if (isContoller) {
-      const playBtn = container.querySelector('.control .btn_cntrl')
-
-      // observerUpdate에 의한 재초기화 시 autoplay 설정되어 있다면 play
-      if (type === 'init' && _.get(swiper, 'params.autoplay') === true || !_.isNaN(parseInt(_.get(swiper, 'params.autoplay.delay')))) {
-        swiper.autoplay.start()
-      }
-
-      if (!_.isNil(playBtn) && _.indexOf(playBtn.classList, 'stop') >= 0) {
-        // 플레이버튼이 stop 상태면 재생하지 않음 (autoplay.disableOnInteraction: false에 대한 동기화)
-        swiper.autoplay.stop()
-      }
+    if (!_.isNil(playBtn) && _.indexOf(playBtn.classList, 'stop') >= 0) {
+      // 플레이버튼이 stop 상태면 재생하지 않음 (autoplay.disableOnInteraction: false에 대한 동기화)
+      swiper.autoplay.stop()
     }
   }
 
-  if (swiper.params.exChange && type !== 'init') swiper.params.exChange(swiper, type, {idx, max})
+  if (swiper.params.exChange && type !== 'init') swiper.params.exChange(swiper, type, pageInfo)
 }
 
 // object-fit IE 대응

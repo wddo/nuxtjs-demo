@@ -5,10 +5,12 @@
       <button class="tabBtn" @click="clickHandler(1)">show 1</button>
       <button class="tabBtn" @click="clickHandler(2)">show 2</button>
       <button class="tabBtn" @click="clickHandler(0)">toggle : {{ this.toggle }}</button>
+      <button class="tabBtn" @click="addSlide(1)">add slide 1</button>
+      <button class="tabBtn" @click="addSlide(5)">add slide 5</button>
     </div>
-    <!--div v-show="isShowNum === 1 || (toggle && !isShowNum)">
+    <div v-show="isShowNum === 1 || (toggle && !isShowNum)">
       <h3>swiper 1</h3>
-      <div v-swiper="swiperOptions" @transitionEnd="onTransitionEnd" class="swiper-container myswiper1">
+      <div v-swiper="swiperOptions" @slideChangeTransitionStart="onSlideChangeTransitionStart" class="swiper-container myswiper1">
         <div class="swiper-wrapper">
           <a href="#" class="swiper-slide" @click.prevent="slideClick('/sub')" v-for="(item, idx) in list" :key="idx">
             {{ item.name }}
@@ -16,7 +18,7 @@
         </div>
         <div class="swiper-pagination"></div>
       </div>
-    </div-->
+    </div>
     <div v-show="isShowNum === 2 || (toggle && !isShowNum)">
       <h3>swiper 2</h3>
       <div v-swiper="swiperOptions2" class="swiper-container myswiper2">
@@ -26,7 +28,7 @@
         <div class="swiper-pagination"></div>
       </div>
     </div>
-    <div>{{ num }}</div>
+    <div>swiepr2 binding : {{ num + 1 }}</div>
   </div>
 </template>
 
@@ -35,20 +37,20 @@ export default {
   data() {
     return {
       num: 0,
-      isShowNum: 0,
+      isShowNum: 2,
       toggle: true,
       list: [],
       msg: '',
       swiperOptions: {
-        loop: true,
+        loop: false,
         spaceBetween: 10,
         pagination: {
           el: '.swiper-pagination',
           type: 'fraction'
         },
         on: {
-          transitionEnd: function() {
-            console.log('transitionEnd 11111')
+          slideChangeTransitionStart: function() {
+            console.log('slideChangeTransitionStart 11111')
           }
         }
       },
@@ -56,41 +58,37 @@ export default {
         loop: true,
         spaceBetween: 10,
         pagination: {
-          el: '.swiper-pagination',
-          type: 'fraction'
+          el: '.swiper-pagination'
+        },
+        autoplay: {
+          delay : 5000
         },
         on: {
-          slideChangeTransitionEnd: function() {
-            console.log('slideChangeTransitionEnd')
+          transitionStart: function() {
+            console.log('transitionStart')
           }
         },
         exChange: (swiper, type, { idx, max }) => {
-          // console.log(this)
           this.num = idx
         }
       }
     }
   },
   created() {
-    console.log('!!!!! swiper.vue / created')
+    if (process.client) console.log('!!!!! swiper.vue / created')
   },
   mounted() {
+    this.$fx.swiper.reset(this) // 테이터 붙기 전 리셋 테스트
+
     console.log('!!!!! swiper.vue / mounted')
     this.$eventBus.$emit(this.EVENT.TRACE, 'loading...')
     setTimeout(() => {
       this.list = [{ name: 'item1' }, { name: 'item2' }, { name: 'item3' }, { name: 'item4' }]
 
-      this.isShowNum = 2
+      this.isShowNum = 0
+      console.log('add item')
       this.$eventBus.$emit(this.EVENT.TRACE, 'add item')
-      // }, 2000)
-    }, 300)
-
-    /*
-    setTimeout(() => {
-      this.list.unshift({ name: "item new" })
-      this.msg = "new item"
-    }, 3000)
-    */
+    }, 2000)
   },
   methods: {
     clickHandler(n) {
@@ -98,11 +96,19 @@ export default {
 
       if (!n) this.toggle = !this.toggle
     },
-    onTransitionEnd() {
-      console.log('transitionEnd 22222')
+    onSlideChangeTransitionStart() {
+      console.log('slideChangeTransitionStart 22222')
     },
     slideClick(link) {
       if (link) this.$router.push(link)
+    },
+    addSlide(n) {
+      this.list = []
+      console.log('new add item', n)
+      let i = n
+      while(i--) {
+        this.list.push({ name: 'new item' + (n - i)  })
+      }
     }
   }
 }

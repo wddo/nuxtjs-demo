@@ -21,6 +21,6 @@ module.exports = {
     'semi': ['error', 'never'],
     'quotes': ['error', 'single'],
     'spaced-comment': ['error', 'always'],
-    'indent': ['error', 2]
+    'indent': ['error', 2, { "SwitchCase": 1 }]
   }
 }
