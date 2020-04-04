@@ -68,9 +68,9 @@ export default {
         pagination: {
           el: '.myswiper2 .swiper-pagination'
         },
-        /* autoplay: {
+        autoplay: {
           delay : 4000
-        }, */
+        },
         navigation: {
           nextEl: '.myswiper2 .nextBtn',
           prevEl: '.myswiper2 .prevBtn'
@@ -90,7 +90,7 @@ export default {
     if (process.client) console.log('!!!!! swiper.vue / created')
   },
   mounted() {
-    // this.$fx.swiper.reset(this) // 테이터 붙기 전 리셋 테스트
+    this.$fx.swiper.reset(this) // 테이터 붙기 전 리셋 테스트
 
     console.log('!!!!! swiper.vue / mounted')
     this.$eventBus.$emit(this.EVENT.TRACE, 'loading...')

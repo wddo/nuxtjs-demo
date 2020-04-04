@@ -6,12 +6,8 @@ const CHANGE_EVENTS = [
 ]
 
 export default {
-  inserted(el, binding, vnode) {
-    console.log('!!!!! inserted', _.join(el.classList, ', '))
-
-    initSwiper(el, binding, vnode)
-    initEvent(el, vnode)
-    // debugger
+  bind(el, binding, vnode) {
+    console.log('!!!!! bind', _.join(el.classList, ', '))
 
     el.addEventListener('update', function(e) {
       const swiper = e.target.swiper
@@ -30,6 +26,11 @@ export default {
         resetSwiper(el, binding, vnode)
       }
     })
+  },
+  inserted(el, binding, vnode) {
+    console.log('!!!!! inserted', _.join(el.classList, ', '))
+
+    resetSwiper(el, binding, vnode)
   },
   componentUpdated(el, binding, vnode, oldVnode) {
     console.log('!!!!! componentUpdated', _.join(el.classList, ', ')/* , binding, vnode */)
