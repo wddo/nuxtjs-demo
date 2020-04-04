@@ -6,11 +6,12 @@ const CHANGE_EVENTS = [
 ]
 
 export default {
-  bind(el, binding, vnode) {
-    console.log('!!!!! bind', _.join(el.classList, ', '))
+  inserted(el, binding, vnode) {
+    console.log('!!!!! inserted', _.join(el.classList, ', '))
 
     initSwiper(el, binding, vnode)
     initEvent(el, vnode)
+    // debugger
 
     el.addEventListener('update', function(e) {
       const swiper = e.target.swiper
@@ -19,6 +20,8 @@ export default {
 
     el.addEventListener('reset', function(e) {
       const swiper = e.target.swiper
+
+      console.log('reset : ', !_.isNil(swiper))
 
       if (!_.isNil(swiper)) {
         binding.value = _.merge({}, binding.value, swiper.options)
@@ -29,30 +32,41 @@ export default {
     })
   },
   componentUpdated(el, binding, vnode, oldVnode) {
-    // resetSwiper(el, binding, vnode)
-
     console.log('!!!!! componentUpdated', _.join(el.classList, ', ')/* , binding, vnode */)
 
     if (el.swiper) {
       const swiper = el.swiper
 
-      if (swiper.params.loop) el.swiper.loopDestroy() // 복제 slide 삭제
+      if (swiper.$wrapperEl.length === 0) {
+        resetSwiper(el, binding, vnode)
+      } else {
+        if (swiper.params.loop) swiper.loopDestroy() // 복제 slide 삭제
 
-      // 초기 options 받아 instance의 params와 병합하여 하여 initSwiper > importantOptions 의해 변경된 options 복구
-      _.merge(swiper.params, importantOptions(el, swiper.defaultOptions, vnode))
+        // 초기 options 받아 instance의 params와 병합하여 하여 initSwiper > importantOptions 의해 변경된 options 복구
+        _.merge(swiper.params, importantOptions(el, swiper.defaultOptions, vnode))
 
-      if (swiper.pagination) el.swiper.pagination.init()  // 페이징 초기화
-      if (swiper.params.loop) el.swiper.loopCreate()      // 복제 slide 생성
+        if (swiper.pagination) swiper.pagination.init() // 페이징 초기화
 
-      swiper.update() // updateSize(), updateSlides(), updateProgress(), updateSlidesClasses()
+        if (swiper.navigation) { // 네비게이션 초기화
+          if ((_.get(swiper.navigation, '$nextEl.length') === 0 || _.get(swiper.navigation, '$prevEl.length') === 0)) {
+            swiper.navigation.init()
+          } else {
+            swiper.navigation.update()
+          }
+        }
 
-      afterModifySwiper(swiper) // 레이아웃 재정의
-      initGallery(el)
-      fixObjectfit(el)
+        if (swiper.params.loop) swiper.loopCreate() // 복제 slide 생성
 
-      if (swiper.realIndex !== getPageInfo(swiper).idx) { // realIndex속성과 실제idx가 다르면 내부 loopCreate()로 인한 paging 어그러진것으로 판단
-        const idx = swiper.params.initialSlide + (swiper.params.loop) ? swiper.loopedSlides : 0
-        swiper.slideTo(idx, 0) // 맨앞으로 초기화
+        swiper.update() // updateSize(), updateSlides(), updateProgress(), updateSlidesClasses()
+
+        afterModifySwiper(swiper) // 레이아웃 재정의
+        initGallery(el)
+        fixObjectfit(el)
+
+        if (swiper.realIndex !== getPageInfo(swiper).idx) { // realIndex속성과 실제idx가 다르면 내부 loopCreate()로 인한 paging 어그러진것으로 판단
+          const idx = swiper.params.initialSlide + (swiper.params.loop) ? swiper.loopedSlides : 0
+          swiper.slideTo(idx, 0) // 맨앞으로 초기화
+        }
       }
     }
   },

@@ -8,7 +8,7 @@
       <button class="tabBtn" @click="addSlide(1)">add slide 1</button>
       <button class="tabBtn" @click="addSlide(5)">add slide 5</button>
     </div>
-    <div v-show="isShowNum === 1 || (toggle && !isShowNum)">
+    <div v-if="isShowNum === 1 || (toggle && !isShowNum)">
       <h3>swiper 1</h3>
       <div v-swiper="swiperOptions" @slideChangeTransitionStart="onSlideChangeTransitionStart" class="swiper-container myswiper1">
         <div class="swiper-wrapper">
@@ -17,9 +17,13 @@
           </a>
         </div>
         <div class="swiper-pagination"></div>
+        <div class="controller" v-if="list.length > 0">
+          <button class="prevBtn">prev</button>
+          <button class="nextBtn">next</button>
+        </div>
       </div>
     </div>
-    <div v-show="isShowNum === 2 || (toggle && !isShowNum)">
+    <div v-if="isShowNum === 2 || (toggle && !isShowNum)">
       <h3>swiper 2</h3>
       <div v-swiper="swiperOptions2" class="swiper-container myswiper2">
         <div class="swiper-wrapper">
@@ -37,7 +41,7 @@ export default {
   data() {
     return {
       num: 0,
-      isShowNum: 2,
+      isShowNum: 3,
       toggle: true,
       list: [],
       msg: '',
@@ -45,8 +49,12 @@ export default {
         loop: false,
         spaceBetween: 10,
         pagination: {
-          el: '.swiper-pagination',
+          el: '.myswiper1 .swiper-pagination',
           type: 'fraction'
+        },
+        navigation: {
+          nextEl: '.myswiper1 .nextBtn',
+          prevEl: '.myswiper1 .prevBtn'
         },
         on: {
           slideChangeTransitionStart: function() {
@@ -58,10 +66,14 @@ export default {
         loop: true,
         spaceBetween: 10,
         pagination: {
-          el: '.swiper-pagination'
+          el: '.myswiper2 .swiper-pagination'
         },
-        autoplay: {
-          delay : 5000
+        /* autoplay: {
+          delay : 4000
+        }, */
+        navigation: {
+          nextEl: '.myswiper2 .nextBtn',
+          prevEl: '.myswiper2 .prevBtn'
         },
         on: {
           transitionStart: function() {
@@ -78,17 +90,22 @@ export default {
     if (process.client) console.log('!!!!! swiper.vue / created')
   },
   mounted() {
-    this.$fx.swiper.reset(this) // 테이터 붙기 전 리셋 테스트
+    // this.$fx.swiper.reset(this) // 테이터 붙기 전 리셋 테스트
 
     console.log('!!!!! swiper.vue / mounted')
     this.$eventBus.$emit(this.EVENT.TRACE, 'loading...')
     setTimeout(() => {
       this.list = [{ name: 'item1' }, { name: 'item2' }, { name: 'item3' }, { name: 'item4' }]
 
-      this.isShowNum = 0
       console.log('add item')
       this.$eventBus.$emit(this.EVENT.TRACE, 'add item')
-    }, 2000)
+
+      this.isShowNum = 0
+
+      this.$nextTick(() => {
+        // this.$fx.swiper.reset(this)
+      })
+    }, 1000)
   },
   methods: {
     clickHandler(n) {
@@ -127,6 +144,23 @@ export default {
   padding: 10px;
   width: 100%;
   height: 100%;
+}
+.myswiper1 .controller {
+  position: absolute;
+  width: 100%;
+  bottom: 10px;
+  z-index: 20;
+  text-align: center;
+}
+.myswiper1 .controller button {
+  cursor: pointer;
+}
+
+.myswiper1 .controller button:nth-child(1) {
+  margin-right: 20px
+}
+.myswiper1 .controller button:nth-child(2) {
+  margin-left: 20px
 }
 
 .myswiper2 {

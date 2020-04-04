@@ -104,16 +104,16 @@ export default {
   methods: {
     categoryHandler(val) {
       switch (val) {
-      case 'all':
-        this.list = _.take(this.oriList, this.oriList.length)
-        break
-      case 'room':
-        this.list = _.take(this.oriList, 4)
-        break
-      case 'outdoor':
-        this.list = _.takeRight(this.oriList, 6)
-        break
-      default:
+        case 'all':
+          this.list = _.take(this.oriList, this.oriList.length)
+          break
+        case 'room':
+          this.list = _.take(this.oriList, 4)
+          break
+        case 'outdoor':
+          this.list = _.takeRight(this.oriList, 6)
+          break
+        default:
       }
 
       this.$nextTick(() => {
@@ -140,6 +140,7 @@ export default {
   height: 50vh;
   width: 100%;
   display: flex;
+  display: -ms-flexbox;
   font-family: serif;
   font-weight: bold;
 }
@@ -149,6 +150,7 @@ export default {
   height: 100%;
   position: relative;
   flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
   text-align: left;
   font-size: 10rem;
   line-height: 50vh;

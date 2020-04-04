@@ -21,8 +21,12 @@ export default {
   },
   methods: {
     trace(msg) {
+      this.isShow = false
       this.msg = msg
-      this.isShow = true
+
+      this.$nextTick(function () {
+        this.isShow = true
+      })
     }
   }
 }
@@ -39,15 +43,17 @@ export default {
 
 #trace {
   display: inline-block;
-  color: green;
   font-weight: bold;
   height: 20px;
 }
 
 .trace-enter-active {
-  transition: transform 0.5s ease;
+  transition: transform 0.5s, color 0.5s;
+  transition-timing-function: cubic-bezier(.75, 0, .25, 1.55);
+  color: green;
 }
 .trace-enter {
   transform: scale(2);
+  color: red;
 }
 </style>
