@@ -17,8 +17,9 @@
           </a>
         </div>
         <div class="swiper-pagination"></div>
-        <div class="controller" v-if="list.length > 0">
+        <div class="control">
           <button class="prevBtn">prev</button>
+          <span class="total"></span>
           <button class="nextBtn">next</button>
         </div>
       </div>
@@ -27,7 +28,7 @@
       <h3>swiper 2</h3>
       <div v-swiper="swiperOptions2" class="swiper-container myswiper2">
         <div class="swiper-wrapper">
-          <div class="swiper-slide" v-for="(item, idx) in list" :key="idx">{{ item.name }}</div>
+          <a href="#" class="swiper-slide" @click.prevent="slideClick('/sub')" v-for="(item, idx) in list" :key="idx">{{ item.name }}</a>
         </div>
         <div class="swiper-pagination"></div>
       </div>
@@ -46,11 +47,11 @@ export default {
       list: [],
       msg: '',
       swiperOptions: {
-        loop: false,
+        loop: true,
         spaceBetween: 10,
         pagination: {
           el: '.myswiper1 .swiper-pagination',
-          type: 'fraction'
+          type: 'progressbar'
         },
         navigation: {
           nextEl: '.myswiper1 .nextBtn',
@@ -68,9 +69,9 @@ export default {
         pagination: {
           el: '.myswiper2 .swiper-pagination'
         },
-        autoplay: {
+        /* autoplay: {
           delay : 4000
-        },
+        }, */
         navigation: {
           nextEl: '.myswiper2 .nextBtn',
           prevEl: '.myswiper2 .prevBtn'
@@ -145,22 +146,15 @@ export default {
   width: 100%;
   height: 100%;
 }
-.myswiper1 .controller {
+.myswiper1 .control {
   position: absolute;
   width: 100%;
   bottom: 10px;
   z-index: 20;
   text-align: center;
 }
-.myswiper1 .controller button {
+.myswiper1 .control button {
   cursor: pointer;
-}
-
-.myswiper1 .controller button:nth-child(1) {
-  margin-right: 20px
-}
-.myswiper1 .controller button:nth-child(2) {
-  margin-left: 20px
 }
 
 .myswiper2 {
