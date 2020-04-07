@@ -43,7 +43,8 @@ export default {
     if (el.swiper) {
       const swiper = el.swiper
 
-      if (swiper.$wrapperEl.length === 0) {
+      // wrapper가 없거나 || update시 최초 loop와 다르면 마지막 slide가 활성화된 상태가 되므로 resetSwiper 호출
+      if (swiper.$wrapperEl.length === 0 || el.swiper.params.loop !== _.get(el.swiper, 'defaultOptions.loop')) {
         resetSwiper(el, binding, vnode)
       } else {
         if (swiper.params.loop) swiper.loopDestroy() // 복제 slide 삭제
@@ -72,7 +73,7 @@ export default {
         initGallery(el)
         fixObjectfit(el)
 
-        if (swiper.realIndex !== getPageInfo(swiper).idx) { // realIndex속성과 실제idx가 다르면 내부 loopCreate()로 인한 paging 어그러진것으로 판단
+        if (swiper.realIndex !== _.get(swiper, 'pageInfo.idx')) { // realIndex속성과 실제idx가 다르면 내부 loopCreate()로 인한 paging 어그러진것으로 판단
           const idx = swiper.params.initialSlide + (swiper.params.loop) ? swiper.loopedSlides : 0
           swiper.slideTo(idx, 0) // 맨앞으로 초기화
         }
@@ -400,6 +401,7 @@ function onChange(swiper, type) {
   }
 
   const pageInfo = getPageInfo(swiper)
+  swiper.pageInfo = pageInfo // pageInfo swiper 인스턴트에 저장하여 활용
 
   // .total 부분 페이징
   const totalElm = container.querySelector('.total')
