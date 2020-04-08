@@ -114,11 +114,13 @@ function getDefaultOptions(el, vnode) {
         // @click 대응
         if (_.indexOf( _.result(this, 'clickedSlide.classList'), 'swiper-slide-duplicate') >= 0) {
           const slide = this.clickedSlide
-          const clickIdx = slide.dataset.swiperSlideIndex
+          const clickIdx = parseInt(slide.getAttribute('data-swiper-slide-index'))
+
+          // clickIdx가 없거나 || 자식에 a 가 있으면 진행 안함
+          if (_.isNil(clickIdx) || _.isNil(slide) || slide.querySelectorAll('a').length > 0) return
+
           const realSlide = _.head(_.at(_.get($vnode, 'children[0].children'), clickIdx))
 
-          // 자식에 a 가 있으면 진행 안함
-          if (_.isNil(slide) || slide.querySelectorAll('a').length > 0) return
           if (!_.isNil(_.get(realSlide, 'data.on.click.fns'))) {
             let evt
 
@@ -180,9 +182,7 @@ function initGallery(el) {
 
   if (_.isNil(swiper)) return
 
-  let galleryTopSwiper
   if (_.indexOf(el.classList, 'gallery-top') >= 0) { // 갤러리 상단
-    galleryTopSwiper = swiper
     swiper.$el.find('.prev, .next').off('click').on('click', function (e) { // dom7
       const target = e.currentTarget
       const topSwiper = target.closest('.swiper-container').swiper
@@ -246,7 +246,7 @@ function importantOptions(el, options, vnode) {
   // const isCalendar = _.indexOf(el.classList, 'calendar_wrap') >= 0 //달력에 autoplay가 필요한지 모르겠음
 
   let returnObject = {
-    resistanceRatio : isOneSlide && !isProgressBar ? 0 : _.result(options, 'resistanceRatio', 0.85), // slide가 1개일때 터치 반응 않하도록 설정
+    resistanceRatio : isOneSlide && !isProgressBar ? 0 : _.result(options, 'resistanceRatio', 0.85), // slide가 1개일때 터치 반응 않하도록 설정 // simulateTouch는 초기 1회용으므로 update 에 대응 못하여 사용하면 안됨
     // loop : !(!isCalendar && isOneSlide),
     // autoplay: (!isCalendar && isOneSlide) ? false : options.autoplay
     loop : isOneSlide ? false : options.loop,
@@ -268,7 +268,7 @@ function afterModifySwiper(swiper) {
   const container = swiper.el
   const slideLength = getSlideLength(swiper.el)
   const slidePerView = swiper.params.slidesPerView
-  const isOneSlide = ((slidePerView !== 'auto' && slideLength <= slidePerView)) // 실제 .swiper-slide 가 보여지는 갯수보다 같거나 작으면
+  const isOneSlide = (slidePerView !== 'auto' && slideLength <= slidePerView) // 실제 .swiper-slide 가 보여지는 갯수보다 같거나 작으면
   const isProgressBar = _.get(swiper.params, 'pagination.type') === 'progressbar' // progressbar는 1/1 라도 노출을 위해
   const isCalendar = _.indexOf(swiper.el.classList, 'calendar_wrap') >= 0
 

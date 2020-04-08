@@ -61,7 +61,9 @@ export default {
         { name: 'slide7', src: 'http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg' },
         { name: 'slide8', src: 'http://image1.hanatour.com/_images/main/md/banner_298.jpg' },
         { name: 'slide9', src: 'http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg' },
-        { name: 'slide10', src: 'http://image1.hanatour.com/_images/main/md/banner_298.jpg' }
+        { name: 'slide10', src: 'http://image1.hanatour.com/_images/main/md/banner_298.jpg' },
+        { name: 'slide11', src: 'http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg' },
+        { name: 'slide12', src: 'http://image1.hanatour.com/_images/main/md/banner_298.jpg' }
       ],
       swiperTopOptions: {
         effect: 'fade',
@@ -83,7 +85,7 @@ export default {
       },
       swiperThumbsPcOptions: {
         slidesPerView: 'auto',
-        slidesPerGroup: 4,
+        slidesPerGroup: 5,
         slidesOffsetBefore: 20,
         slidesOffsetAfter: 20,
         watchSlidesVisibility: true,
