@@ -36,7 +36,9 @@
         <h3>swiper 2</h3>
         <div v-swiper="swiperOptions2" class="swiper-container myswiper2">
           <div class="swiper-wrapper">
-            <a href="#" class="swiper-slide" @click.prevent="slideClick('/sub')" v-for="(item, idx) in list" :key="idx">{{ item.name }}</a>
+            <li class="swiper-slide" v-for="(item, idx) in list" :key="idx">
+              <a href="#" @click.prevent="slideClick('/sub2')">{{ item.name }}</a>
+            </li>
           </div>
           <div class="swiper-pagination"></div>
           <div class="control">

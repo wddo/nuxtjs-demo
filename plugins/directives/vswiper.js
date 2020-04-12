@@ -10,7 +10,6 @@ let $vnode
 export default {
   bind(el, binding, vnode) {
     console.log('!!!!! bind', _.join(el.classList, ', '))
-    setVnode(vnode)
 
     el.addEventListener('update', function(e) {
       const swiper = e.target.swiper
@@ -23,6 +22,10 @@ export default {
       console.log('reset : ', !_.isNil(swiper))
 
       if (!_.isNil(swiper)) {
+        const el = _.get(swiper, 'directiveData.el')
+        const binding = _.get(swiper, 'directiveData.binding')
+        const vnode = _.get(swiper, 'directiveData.vnode')
+
         binding.value = _.merge({}, binding.value, swiper.options)
         delete swiper.options
 
@@ -32,13 +35,11 @@ export default {
   },
   inserted(el, binding, vnode) {
     console.log('!!!!! inserted', _.join(el.classList, ', '))
-    setVnode(vnode)
 
     resetSwiper(el, binding, vnode)
   },
   componentUpdated(el, binding, vnode) {
     console.log('!!!!! componentUpdated', _.join(el.classList, ', ')/* , binding, vnode */)
-    setVnode(vnode)
 
     if (el.swiper) {
       const swiper = el.swiper
@@ -82,14 +83,30 @@ export default {
   },
   unbind(el, binding, vnode) {
     console.log('!!!!! unbind / ', _.join(el.classList, ', '))
-    setVnode(vnode)
 
     deleteSwiper(el, binding, vnode)
   }
 }
 
-function setVnode(vnode) {
-  $vnode = vnode
+function findDataOfChildren(target, path) {
+  let returnValue
+
+  if (!_.isNil(_.get(target, path))) {
+    returnValue = _.get(target, path)
+  } else {
+    const children = _.get(target, 'children')
+
+    _.forEach(children, (item, idx) => {
+      const result = this.findDataOfChildren(item, path)
+
+      if (!_.isNil(result)) {
+        returnValue = result
+        return false
+      }
+    })
+  }
+
+  return returnValue
 }
 
 function getDefaultOptions(el, vnode) {
@@ -116,12 +133,12 @@ function getDefaultOptions(el, vnode) {
           const slide = this.clickedSlide
           const clickIdx = parseInt(slide.getAttribute('data-swiper-slide-index'))
 
-          // clickIdx가 없거나 || 자식에 a 가 있으면 진행 안함
-          if (_.isNil(clickIdx) || _.isNil(slide) || slide.querySelectorAll('a').length > 0) return
+          if (_.isNil(clickIdx) || _.isNil(slide)) return
 
-          const realSlide = _.head(_.at(_.get($vnode, 'children[0].children'), clickIdx))
+          const realSlide = _.nth(_.get(this, 'directiveData.vnode.children[0].children'), clickIdx)
+          const clickFn = this.fns.findDataOfChildren(realSlide, 'data.on.click.fns')
 
-          if (!_.isNil(_.get(realSlide, 'data.on.click.fns'))) {
+          if (!_.isNil(clickFn)) {
             let evt
 
             if (e.type === 'mouseup') {
@@ -133,7 +150,7 @@ function getDefaultOptions(el, vnode) {
               })
             }
 
-            if (evt) realSlide.data.on.click.fns(evt)
+            if (evt) clickFn(evt)
           }
         }
       }
@@ -162,6 +179,8 @@ function initSwiper(el, binding, vnode) {
 
   const swiper = new Swiper(el, opts)
   swiper.defaultOptions = swiperOptions // componentUpdated 활용할 기본 options
+  swiper.directiveData = {el, binding, vnode} // directive 데이터 저장
+  swiper.fns = {findDataOfChildren}
 
   if (!_.isNil(swiper)) afterModifySwiper(swiper)
 
