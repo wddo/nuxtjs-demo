@@ -17,6 +17,12 @@
           href="https://github.com/nuxt/nuxt.js"
           target="_blank"
           class="button--grey">GitHub</a>
+        <p>
+          <router-link to="/script">script</router-link>
+        </p>
+        <p>
+          <router-link to="/scriptJsx">scriptJsx</router-link>
+        </p>
       </div>
     </div>
   </section>
