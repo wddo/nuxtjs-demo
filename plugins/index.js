@@ -34,7 +34,7 @@ Vue.prototype.$fx = {
       )
 
       // update 상태에서 Observer 지원하면 실행 안함
-      if (opts.eventName === 'update' && $nuxt.$fx.isObserverSupport) return
+      if (opts.eventName === 'update' && isObserverSupport()) return
 
       const container = _.get(opts.container, '$el', opts.container) // refs 일수도 있으니 체크
 
@@ -86,4 +86,8 @@ Vue.prototype.$fx = {
       }
     }
   }
+}
+
+function isObserverSupport() {
+  return 'MutationObserver' in window || 'WebkitMutationObserver' in window
 }

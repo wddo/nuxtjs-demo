@@ -5,8 +5,6 @@ const CHANGE_EVENTS = [
   'transitionEnd'
 ]
 
-let $vnode
-
 export default {
   bind(el, binding, vnode) {
     console.log('!!!!! bind', _.join(el.classList, ', '))
@@ -25,6 +23,8 @@ export default {
         const el = _.get(swiper, 'directiveData.el')
         const binding = _.get(swiper, 'directiveData.binding')
         const vnode = _.get(swiper, 'directiveData.vnode')
+
+        if (_.isNil(el) || _.isNil(binding) || _.isNil(vnode)) return
 
         binding.value = _.merge({}, binding.value, swiper.options)
         delete swiper.options
@@ -96,8 +96,8 @@ function findDataOfChildren(target, path) {
   } else {
     const children = _.get(target, 'children')
 
-    _.forEach(children, (item, idx) => {
-      const result = this.findDataOfChildren(item, path)
+    _.forEach(children, item => {
+      const result = findDataOfChildren(item, path)
 
       if (!_.isNil(result)) {
         returnValue = result
@@ -136,7 +136,7 @@ function getDefaultOptions(el, vnode) {
           if (_.isNil(clickIdx) || _.isNil(slide)) return
 
           const realSlide = _.nth(_.get(this, 'directiveData.vnode.children[0].children'), clickIdx)
-          const clickFn = this.fns.findDataOfChildren(realSlide, 'data.on.click.fns')
+          const clickFn = findDataOfChildren(realSlide, 'data.on.click.fns')
 
           if (!_.isNil(clickFn)) {
             let evt
@@ -159,14 +159,14 @@ function getDefaultOptions(el, vnode) {
 }
 
 // swiper 삭제
-function deleteSwiper(el, binding, vnode) {
+function deleteSwiper(el, binding, vnode, isCleanStyle) {
   console.log('!!!!! deleteSwiper / ', _.join(el.classList, ', '))
   const swiper = el.swiper
 
   if (_.isNil(swiper)) return
 
   if (swiper.params.exChange) delete swiper.params.exChange
-  if (swiper.params.init) swiper.destroy(false, true)
+  if (swiper.params.init) swiper.destroy(false, _.defaultTo(isCleanStyle, true))
 }
 
 // swiper 초기화
@@ -180,7 +180,6 @@ function initSwiper(el, binding, vnode) {
   const swiper = new Swiper(el, opts)
   swiper.defaultOptions = swiperOptions // componentUpdated 활용할 기본 options
   swiper.directiveData = {el, binding, vnode} // directive 데이터 저장
-  swiper.fns = {findDataOfChildren}
 
   if (!_.isNil(swiper)) afterModifySwiper(swiper)
 
@@ -404,7 +403,7 @@ function onChange(swiper, type) {
   console.log('onChange : ', type)
   const container = swiper.el
 
-  // 복제 slide @click.prevnet 대응
+  // 복제 slide @click.prevent 대응
   if (type === 'init') {
     _.forEach(swiper.slides, item => {
       if (_.indexOf(item.classList, 'swiper-slide-duplicate') >= 0) {
