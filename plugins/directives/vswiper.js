@@ -185,6 +185,8 @@ function initSwiper(el, binding, vnode) {
 
   initGallery(el)
   fixObjectfit(el)
+
+  if (!isObserverSupport()) onChange(swiper, 'init') // init 대신
 }
 
 // swiper 재생성
@@ -445,6 +447,10 @@ function onChange(swiper, type) {
   }
 
   if (swiper.params.exChange && type !== 'init') swiper.params.exChange(swiper, type, pageInfo)
+}
+
+function isObserverSupport() {
+  return 'MutationObserver' in window || 'WebkitMutationObserver' in window
 }
 
 // object-fit IE 대응
