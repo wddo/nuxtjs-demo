@@ -37,48 +37,60 @@ export default {
     console.log('!!!!! inserted', _.join(el.classList, ', '))
 
     resetSwiper(el, binding, vnode)
-  },
+  },/*
+  update(el, binding, vnode) {
+    console.log('!!!!! update', _.join(el.classList, ', '))
+
+    console.log('a')
+  }, */
   componentUpdated(el, binding, vnode) {
     console.log('!!!!! componentUpdated', _.join(el.classList, ', ')/* , binding, vnode */)
 
     if (el.swiper) {
       const swiper = el.swiper
 
-      // wrapper가 없거나 || update시 최초 loop와 다르면 마지막 slide가 활성화된 상태가 되므로 resetSwiper 호출
-      if (swiper.$wrapperEl.length === 0 || el.swiper.params.loop !== _.get(el.swiper, 'defaultOptions.loop')) {
-        resetSwiper(el, binding, vnode)
-      } else {
-        if (swiper.params.loop) swiper.loopDestroy() // 복제 slide 삭제
+      _.debounce(() => {
+        // wrapper가 없거나 || update시 최초 loop와 다르면 마지막 slide가 활성화된 상태가 되므로 resetSwiper 호출
+        if (swiper.$wrapperEl.length === 0/*  || el.swiper.params.loop !== _.get(el.swiper, 'defaultOptions.loop') */) {
+          // if (true) {
+          console.log('리셋')
+          resetSwiper(el, binding, vnode)
+        } else {
+          console.log('업데이트')
+          if (swiper.params.loop) swiper.loopDestroy() // 복제 slide 삭제
 
-        // 초기 options 받아 instance의 params와 병합하여 하여 initSwiper > importantOptions 의해 변경된 options 복구
-        _.merge(swiper.params, importantOptions(el, swiper.defaultOptions, vnode))
+          // 초기 options 받아 instance의 params와 병합하여 하여 initSwiper > importantOptions 의해 변경된 options 복구
+          _.merge(swiper.params, importantOptions(el, swiper.defaultOptions, vnode))
 
-        if (swiper.pagination) swiper.pagination.init() // 페이징 초기화
+          if (swiper.pagination) swiper.pagination.init() // 페이징 초기화
 
-        if (swiper.navigation) { // 네비게이션 초기화
-          if ((_.get(swiper.navigation, '$nextEl.length') === 0 || _.get(swiper.navigation, '$prevEl.length') === 0)) {
-            swiper.navigation.init()
-          } else {
-            swiper.navigation.update()
+          if (swiper.navigation) { // 네비게이션 초기화
+            if ((_.get(swiper.navigation, '$nextEl.length') === 0 || _.get(swiper.navigation, '$prevEl.length') === 0)) {
+              swiper.navigation.init()
+            } else {
+              swiper.navigation.update()
+            }
+          }
+
+          if (swiper.params.loop) swiper.loopCreate() // 복제 slide 생성
+
+          swiper.update() // updateSize(), updateSlides(), updateProgress(), updateSlidesClasses()
+
+          afterModifySwiper(swiper) // 레이아웃 재정의
+
+          onChange(swiper, 'init')
+
+          initGallery(el)
+          fixObjectfit(el)
+
+          if (swiper.realIndex !== _.get(swiper, 'pageInfo.idx') || swiper.params.loopAdditionalSlides !== 0) {
+          // realIndex속성과 실제idx가 다르면 내부 loopCreate()로 인한 paging 어그러진것으로 판단
+          // swiper.params.loopAdditionalSlides 이 기본값이 아닐때 update 되면 페이징이 어그러짐
+            const idx = swiper.params.initialSlide + (swiper.params.loop) ? swiper.loopedSlides : 0
+            swiper.slideTo(idx, 0) // 맨앞으로 초기화
           }
         }
-
-        if (swiper.params.loop) swiper.loopCreate() // 복제 slide 생성
-
-        swiper.update() // updateSize(), updateSlides(), updateProgress(), updateSlidesClasses()
-
-        afterModifySwiper(swiper) // 레이아웃 재정의
-
-        onChange(swiper, 'init')
-
-        initGallery(el)
-        fixObjectfit(el)
-
-        if (swiper.realIndex !== _.get(swiper, 'pageInfo.idx')) { // realIndex속성과 실제idx가 다르면 내부 loopCreate()로 인한 paging 어그러진것으로 판단
-          const idx = swiper.params.initialSlide + (swiper.params.loop) ? swiper.loopedSlides : 0
-          swiper.slideTo(idx, 0) // 맨앞으로 초기화
-        }
-      }
+      }, 100)()
     }
   },
   unbind(el, binding, vnode) {
@@ -269,7 +281,7 @@ function importantOptions(el, options, vnode) {
     resistanceRatio : isOneSlide && !isProgressBar ? 0 : _.result(options, 'resistanceRatio', 0.85), // slide가 1개일때 터치 반응 않하도록 설정 // simulateTouch는 초기 1회용으므로 update 에 대응 못하여 사용하면 안됨
     // loop : !(!isCalendar && isOneSlide),
     // autoplay: (!isCalendar && isOneSlide) ? false : options.autoplay
-    loop : isOneSlide ? false : options.loop,
+    loop : isOneSlide ? false : options.loop, // update 시 반영이 core 소스에 반영이 안되어 .swiper-button-disabled 제대로 안걸려 삭제, 다른 방법 찾아봐야함 xxx
     autoplay: isOneSlide ? false : options.autoplay
   }
 
@@ -402,7 +414,7 @@ function getPageInfo(swiper) {
 }
 
 function onChange(swiper, type) {
-  console.log('onChange : ', type)
+  // console.log('onChange : ', type)
   const container = swiper.el
 
   // 복제 slide @click.prevent 대응

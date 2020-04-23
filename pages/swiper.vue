@@ -6,6 +6,8 @@
       <button class="tabBtn" @click="clickHandler(2)">show 2</button>
       <button class="tabBtn" @click="clickHandler(0)">toggle : {{ this.toggle }}</button>
       <button class="tabBtn" @click="addSlide(1)">add slide 1</button>
+      <button class="tabBtn" @click="addSlide(2)">add slide 2</button>
+      <button class="tabBtn" @click="addSlide(3)">add slide 3</button>
       <button class="tabBtn" @click="addSlide(5)">add slide 5</button>
     </div>
     <ul class="tabs">
@@ -18,7 +20,7 @@
         <div v-swiper="swiperOptions" @slideChangeTransitionStart="onSlideChangeTransitionStart" class="swiper-container myswiper1">
           <div class="swiper-wrapper">
             <a href="#" class="swiper-slide" @click.prevent="slideClick('/sub')" v-for="(item, idx) in list" :key="idx">
-              {{ item.name }}
+              <fx-img :txt="item.name" :color="item.color"></fx-img>
             </a>
           </div>
           <div class="swiper-pagination"></div>
@@ -31,13 +33,17 @@
       </div>
     </div>
     <div>swiepr binding : {{ num + 1 }}</div>
-    <div class="panel selected">
+    <!--div class="panel selected">
       <div v-if="isShowNum === 2 || (toggle && !isShowNum)">
         <h3>swiper 2</h3>
         <div v-swiper="swiperOptions2" class="swiper-container myswiper2">
           <div class="swiper-wrapper">
-            <li class="swiper-slide" v-for="(item, idx) in list" :key="idx">
-              <a href="#" @click.prevent="slideClick('/sub2')">{{ item.name }}</a>
+            <a href="#" class="swiper-slide" @click.prevent="slideClick('/sub')" v-for="(item, idx) in list" :key="idx">
+              {{ item.name }}
+            </a-->
+            <!--li class="swiper-slide" v-for="(item, idx) in list" :key="idx">
+              <div @click="videoDimmedClick($event)" style="left:0;top:0;position:absolute;opacity:0.4;background-color:red;width:100%;height:100%"></div>
+              <iframe src="https://www.youtube.com/embed/tgbNymZ7vqY" width="100%" height="100%" frameborder="0"></iframe>
             </li>
           </div>
           <div class="swiper-pagination"></div>
@@ -48,25 +54,30 @@
           </div>
         </div>
       </div>
-    </div>
+    </div-->
   </div>
 </template>
 
 <script>
+import FxImg from '~/components/FxImg'
+
 export default {
+  components: {FxImg},
   data() {
     return {
       num: 0,
       isShowNum: 1,
       toggle: true,
-      list: [{ name: 'no item' }],
+      list: [],
       msg: '',
       swiperOptions: {
         loop: true,
+        loopAdditionalSlides: 2,
+        slidesPerView: 2,
         spaceBetween: 10,
         pagination: {
-          el: '.myswiper1 .swiper-pagination',
-          type: 'progressbar'
+          el: '.myswiper1 .swiper-pagination'/* ,
+          type: 'progressbar' */
         },
         navigation: {
           nextEl: '.myswiper1 .nextBtn',
@@ -74,11 +85,12 @@ export default {
         },
         on: {
           slideChangeTransitionStart: function() {
-            console.log('slideChangeTransitionStart 11111')
+            // console.log('slideChangeTransitionStart 11111')
           }
         },
         exChange: (swiper, type, { idx, max }) => {
-          this.num = idx
+          console.log('--------')
+          // this.num = idx
         }
       },
       swiperOptions2: {
@@ -153,6 +165,12 @@ export default {
     })
   },
   methods: {
+    videoDimmedClick(e) {
+      const target = e.currentTarget
+      const iframe = target.nextElementSibling
+      var requestFullScreen = iframe.requestFullScreen || iframe.mozRequestFullScreen || iframe.webkitRequestFullScreen
+      if (requestFullScreen) requestFullScreen.bind(iframe)()
+    },
     clickHandler(n) {
       this.isShowNum = n
 
@@ -168,8 +186,9 @@ export default {
       this.list = []
       console.log('new add item', n)
       let i = n
+      const color = '#'+Math.random().toString(16).substr(-6)
       while(i--) {
-        this.list.push({ name: 'new item' + (n - i)  })
+        this.list.push({ name: 'new item ' + n + '_' + (n - i) , color })
       }
     }
   }
@@ -231,5 +250,10 @@ export default {
 
 .panel.selected {
   display: block;
+}
+
+button.swiper-button-disabled {
+  opacity: 0.2;
+  cursor: default ;
 }
 </style>
