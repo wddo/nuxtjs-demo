@@ -1,3 +1,18 @@
+/**
+ * [bug report] //기본 상태(non data binding), 바인딩 상태(exChange > data binding > componentUpdated)
+ *  -fix- next 방향으로 이동시 loop 안되는 문제 (loopAdditionalSlides를 slidePerView 수만큼 지정해서 해결)
+ *  -fix- loop:false 에서 true로 변경되면 복사된 이전 slide 남아있는 경우 (_.debounce 로 딜레이 줘서 데이터 변경 후 update 타도록 수정)
+ *  -fix- loop:false 에서 true로 변경되면 navigation의 disabled 클래스 변경 안되는 문제 (componentUpdated > update 루트에서 swiper.navigation.destroy()로 해결)
+ *  -fix- loop:false 에서 true로 변경되면 슬라이더가 첫번째가 아닌 문제
+ *        (componentUpdated에 el.swiper.params.loop !== _.get(swiperOptions, 'loop') 추가하여 resetSwiper 타도록 하여 해결)
+ *  -fix- 위와 동일한 상태에서 바인딩 상태가 되면 resetSwiper 타면 next시 prev갔다 next되는 문제
+ *        (추가한 el.swiper.params.loop !== _.get(swiperOptions, 'loop') 제거하고 update 루트에서 slideTo로 해결)
+ *  -fix- 1/1 아닌 상태에서 slide 변경 시 페이징 초기화 되지 않음.. 오히려 이게 자연스러운 상태 (초기화를 원한다면 slide 변경 후 this.$fx.swiper.reset 실행)
+ *
+ *  observer off!!
+ *  -fix- dispaly:none 일때 slide 갯수 update 시 페이징 안박힘 (inserted 에 onChange(el.swiper, 'init') 추가로 해결)
+ */
+
 const CHANGE_EVENTS = [
   'slideChangeTransitionStart',
   'transitionStart',
@@ -17,8 +32,6 @@ export default {
     el.addEventListener('reset', function(e) {
       const swiper = e.target.swiper
 
-      console.log('reset : ', !_.isNil(swiper))
-
       if (!_.isNil(swiper)) {
         const el = _.get(swiper, 'directiveData.el')
         const binding = _.get(swiper, 'directiveData.binding')
@@ -37,44 +50,46 @@ export default {
     console.log('!!!!! inserted', _.join(el.classList, ', '))
 
     resetSwiper(el, binding, vnode)
-  },/*
-  update(el, binding, vnode) {
-    console.log('!!!!! update', _.join(el.classList, ', '))
 
-    console.log('a')
-  }, */
+    onChange(el.swiper, 'init')
+  },
   componentUpdated(el, binding, vnode) {
     console.log('!!!!! componentUpdated', _.join(el.classList, ', ')/* , binding, vnode */)
 
     if (el.swiper) {
       const swiper = el.swiper
+      const swiperOptions = _.merge({}, getDefaultOptions(el, vnode), binding.value)
+      const isGallery = _.indexOf(el.classList, 'gallery-top') >= 0 || _.indexOf(el.classList, 'gallery-thumbs') >= 0
 
-      _.debounce(() => {
-        // wrapper가 없거나 || update시 최초 loop와 다르면 마지막 slide가 활성화된 상태가 되므로 resetSwiper 호출
-        if (swiper.$wrapperEl.length === 0/*  || el.swiper.params.loop !== _.get(el.swiper, 'defaultOptions.loop') */) {
-          // if (true) {
-          console.log('리셋')
+      _.debounce(function () {
+      // wrapper가 없거나 || update시 최초 loop와 다르면 마지막 slide가 활성화된 상태가 되므로 resetSwiper 호출 (update 측에서 slideTo로 해결)
+        if (swiper.$wrapperEl.length === 0/* || el.swiper.params.loop !== _.get(swiperOptions, 'loop')*/) {
+          console.log('@@@@@ reset')
           resetSwiper(el, binding, vnode)
+
+          onChange(swiper, 'init')
         } else {
-          console.log('업데이트')
+          console.log('@@@@@ update')
+          if (swiper.navigation && !swiper.params.loop) swiper.navigation.destroy() // 네비 상태 삭제
           if (swiper.params.loop) swiper.loopDestroy() // 복제 slide 삭제
 
           // 초기 options 받아 instance의 params와 병합하여 하여 initSwiper > importantOptions 의해 변경된 options 복구
-          _.merge(swiper.params, importantOptions(el, swiper.defaultOptions, vnode))
+          _.merge(swiper.params, importantOptions(el, swiperOptions, vnode))
 
           if (swiper.pagination) swiper.pagination.init() // 페이징 초기화
 
           if (swiper.navigation) { // 네비게이션 초기화
-            if ((_.get(swiper.navigation, '$nextEl.length') === 0 || _.get(swiper.navigation, '$prevEl.length') === 0)) {
-              swiper.navigation.init()
-            } else {
-              swiper.navigation.update()
-            }
+            swiper.navigation.init()
+            swiper.navigation.update()
           }
-
+          if (swiper.thumbs) {
+            swiper.thumbs.update()
+          }
           if (swiper.params.loop) swiper.loopCreate() // 복제 slide 생성
 
           swiper.update() // updateSize(), updateSlides(), updateProgress(), updateSlidesClasses()
+
+          swiper.directiveData = {el, binding, vnode} // directive 데이터 저장
 
           afterModifySwiper(swiper) // 레이아웃 재정의
 
@@ -83,14 +98,13 @@ export default {
           initGallery(el)
           fixObjectfit(el)
 
-          if (swiper.realIndex !== _.get(swiper, 'pageInfo.idx') || swiper.params.loopAdditionalSlides !== 0) {
-          // realIndex속성과 실제idx가 다르면 내부 loopCreate()로 인한 paging 어그러진것으로 판단
-          // swiper.params.loopAdditionalSlides 이 기본값이 아닐때 update 되면 페이징이 어그러짐
+          if (swiper.realIndex !== _.get(swiper, 'pageInfo.idx')) { // realIndex속성과 실제idx가 다르면 내부 loopCreate()로 인한 paging 어그러진것으로 판단
             const idx = swiper.params.initialSlide + (swiper.params.loop) ? swiper.loopedSlides : 0
+
             swiper.slideTo(idx, 0) // 맨앞으로 초기화
           }
         }
-      }, 100)()
+      }, 100, {leading: isGallery})()
     }
   },
   unbind(el, binding, vnode) {
@@ -124,11 +138,11 @@ function findDataOfChildren(target, path) {
 function getDefaultOptions(el, vnode) {
   return {
     roundLengths: true,
-    observer: true,
+    /* observer: true,
     observeParents: true,
-    observeSlideChildren: true,
+    observeSlideChildren: true, */
     on: {
-      observerUpdate: function(e) {
+      /* observerUpdate: function(e) {
         if (e.type === 'attributes' && _.indexOf(e.target.classList, 'page-enter-active') >= 0) {
           console.log('observerUpdate reset')
           this.el.dispatchEvent(new CustomEvent('reset')) // history back 대응
@@ -138,10 +152,10 @@ function getDefaultOptions(el, vnode) {
           console.log('observerUpdate onChange(init)')
           if (!_.isNil(_.result(e.target, 'swiper'))) onChange(e.target.swiper, 'init') // init 대신
         }
-      },
+      }, */
       click: function(e) {
         // @click 대응
-        if (_.indexOf( _.result(this, 'clickedSlide.classList'), 'swiper-slide-duplicate') >= 0) {
+        if (_.indexOf(_.result(this, 'clickedSlide.classList'), 'swiper-slide-duplicate') >= 0) {
           const slide = this.clickedSlide
           const clickIdx = parseInt(slide.getAttribute('data-swiper-slide-index'))
 
@@ -183,9 +197,7 @@ function deleteSwiper(el, binding, vnode, isCleanStyle) {
 
 // swiper 초기화
 function initSwiper(el, binding, vnode) {
-  let swiperOptions = _.merge({},
-    getDefaultOptions(el, vnode),
-    binding.value)
+  let swiperOptions = _.merge({}, getDefaultOptions(el, vnode), binding.value)
 
   const opts = _.merge({}, swiperOptions, importantOptions(el, swiperOptions, vnode))
 
@@ -290,7 +302,7 @@ function importantOptions(el, options, vnode) {
     _.set(returnObject, 'autoplay.disableOnInteraction', false) // autoplay가 true 경우도 {} 화되면 true 로 인정
   }
 
-  console.log('@@@@@ importantOptions() / isOneSlide', isOneSlide, returnObject)
+  // console.log('@@@@@ importantOptions() / isOneSlide', isOneSlide, returnObject)
 
   return returnObject
 }
@@ -304,7 +316,7 @@ function afterModifySwiper(swiper) {
   const isProgressBar = _.get(swiper.params, 'pagination.type') === 'progressbar' // progressbar는 1/1 라도 노출을 위해
   const isCalendar = _.indexOf(swiper.el.classList, 'calendar_wrap') >= 0
 
-  console.log('@@@@@ afterModifySwiper() / slides.length', swiper.slides.length, 'getSlideLength', slideLength)
+  // console.log('@@@@@ afterModifySwiper() / slides.length', swiper.slides.length, 'getSlideLength', slideLength)
 
   if (!isCalendar) {
     const pagination = swiper.pagination.el

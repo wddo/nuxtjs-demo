@@ -8,6 +8,7 @@
       <button class="tabBtn" @click="addSlide(1)">add slide 1</button>
       <button class="tabBtn" @click="addSlide(2)">add slide 2</button>
       <button class="tabBtn" @click="addSlide(3)">add slide 3</button>
+      <button class="tabBtn" @click="addSlide(4)">add slide 4</button>
       <button class="tabBtn" @click="addSlide(5)">add slide 5</button>
     </div>
     <ul class="tabs">
@@ -39,12 +40,12 @@
         <div v-swiper="swiperOptions2" class="swiper-container myswiper2">
           <div class="swiper-wrapper">
             <a href="#" class="swiper-slide" @click.prevent="slideClick('/sub')" v-for="(item, idx) in list" :key="idx">
-              {{ item.name }}
-            </a-->
-            <!--li class="swiper-slide" v-for="(item, idx) in list" :key="idx">
+              <fx-img :txt="item.name" :color="item.color"></fx-img>
+            </a>
+            !--li class="swiper-slide" v-for="(item, idx) in list" :key="idx">
               <div @click="videoDimmedClick($event)" style="left:0;top:0;position:absolute;opacity:0.4;background-color:red;width:100%;height:100%"></div>
               <iframe src="https://www.youtube.com/embed/tgbNymZ7vqY" width="100%" height="100%" frameborder="0"></iframe>
-            </li>
+            </li--
           </div>
           <div class="swiper-pagination"></div>
           <div class="control">
@@ -89,7 +90,6 @@ export default {
           }
         },
         exChange: (swiper, type, { idx, max }) => {
-          console.log('--------')
           // this.num = idx
         }
       },
@@ -125,7 +125,7 @@ export default {
     this.$eventBus.$emit(this.EVENT.TRACE, 'loading...')
 
     setTimeout(() => {
-      this.list = [{ name: 'item1' }, { name: 'item2' }, { name: 'item3' }, { name: 'item4' }]
+      this.list = [{ name: 'item1' }, { name: 'item2' }, { name: 'item3' }, { name: 'item4' }, { name: 'item5' }]
 
       console.log('add item')
       this.$eventBus.$emit(this.EVENT.TRACE, 'add item')
@@ -177,7 +177,7 @@ export default {
       if (!n) this.toggle = !this.toggle
     },
     onSlideChangeTransitionStart() {
-      console.log('slideChangeTransitionStart 22222')
+      // console.log('slideChangeTransitionStart 22222')
     },
     slideClick(link) {
       if (link) this.$router.push(link)
@@ -190,12 +190,38 @@ export default {
       while(i--) {
         this.list.push({ name: 'new item ' + n + '_' + (n - i) , color })
       }
+
+      // this.$fx.swiper.reset(this) //slide 변경 후 1/1 원한다면 실행
     }
   }
 }
 </script>
 
 <style scoped>
+.swiper-container {
+  width: 100%;
+  height: 100%;
+}
+.swiper-slide {
+  text-align: center;
+  font-size: 18px;
+  background: #fff;
+
+  /* Center slide text vertically */
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+}
+
 .myswiper1 {
   height: 200px;
 }

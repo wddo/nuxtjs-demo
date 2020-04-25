@@ -77,12 +77,15 @@ Vue.prototype.$fx = {
         })
 
         // thumbs에 top정보 정의
-        if (target.$refs.swiperThumbs.swiper)
+        if (target.$refs.swiperThumbs.swiper) {
           _.set(
             target.$refs.swiperThumbs.swiper,
             'top.swiper',
             target.$refs.swiperTop.swiper
           )
+
+          if (target.$refs.swiperThumbs.swiper.params.loop !== true) target.$refs.swiperThumbs.swiper.slideTo(0, 0)
+        }
       }
     }
   }
