@@ -11,6 +11,11 @@
  *
  *  observer off!!
  *  -fix- dispaly:none 일때 slide 갯수 update 시 페이징 안박힘 (inserted 에 onChange(el.swiper, 'init') 추가로 해결)
+ *
+ *  observer re on!!
+ *    ie10 지원 보다 observer off로 잃는 잇점이 더 많아 다시 observer 지원
+ *    단, display 에 대한 1페이징 초기화 필요 시 resetSwiper 필요
+ *
  */
 
 const CHANGE_EVENTS = [
@@ -43,6 +48,8 @@ export default {
         delete swiper.options
 
         resetSwiper(el, binding, vnode)
+
+        onChange(el.swiper, 'reset')
       }
     })
   },
@@ -51,7 +58,7 @@ export default {
 
     resetSwiper(el, binding, vnode)
 
-    onChange(el.swiper, 'init')
+    // onChange(el.swiper, 'init') // observer: true로 필요 없어짐
   },
   componentUpdated(el, binding, vnode) {
     console.log('!!!!! componentUpdated', _.join(el.classList, ', ')/* , binding, vnode */)
@@ -67,7 +74,7 @@ export default {
           console.log('@@@@@ reset')
           resetSwiper(el, binding, vnode)
 
-          onChange(swiper, 'init')
+          // onChange(swiper, 'init') // resetSwiper > initSwiper 내에서 호출하므로 중복호출이라 삭제
         } else {
           console.log('@@@@@ update')
           if (swiper.navigation && !swiper.params.loop) swiper.navigation.destroy() // 네비 상태 삭제
@@ -89,7 +96,7 @@ export default {
 
           swiper.update() // updateSize(), updateSlides(), updateProgress(), updateSlidesClasses()
 
-          swiper.directiveData = {el, binding, vnode} // directive 데이터 저장
+          swiper.directiveData = {el, binding, vnode} // directive 데이터 재저장
 
           afterModifySwiper(swiper) // 레이아웃 재정의
 
@@ -104,7 +111,7 @@ export default {
             swiper.slideTo(idx, 0) // 맨앞으로 초기화
           }
         }
-      }, 100, {leading: isGallery})()
+      }, 100, {leading: isGallery})() // loopCreate 시점이 너무 빨라 이전 slide 가 복제되는 이슈로 인하여 100ms 딜레이
     }
   },
   unbind(el, binding, vnode) {
@@ -138,9 +145,9 @@ function findDataOfChildren(target, path) {
 function getDefaultOptions(el, vnode) {
   return {
     roundLengths: true,
-    /* observer: true,
+    observer: true,
     observeParents: true,
-    observeSlideChildren: true, */
+    observeSlideChildren: true,
     on: {
       /* observerUpdate: function(e) {
         if (e.type === 'attributes' && _.indexOf(e.target.classList, 'page-enter-active') >= 0) {
@@ -210,7 +217,7 @@ function initSwiper(el, binding, vnode) {
   initGallery(el)
   fixObjectfit(el)
 
-  if (!isObserverSupport()) onChange(swiper, 'init') // init 대신
+  onChange(swiper, 'init') // init 대신
 }
 
 // swiper 재생성
@@ -290,10 +297,10 @@ function importantOptions(el, options, vnode) {
   // const isCalendar = _.indexOf(el.classList, 'calendar_wrap') >= 0 //달력에 autoplay가 필요한지 모르겠음
 
   let returnObject = {
-    resistanceRatio : isOneSlide && !isProgressBar ? 0 : _.result(options, 'resistanceRatio', 0.85), // slide가 1개일때 터치 반응 않하도록 설정 // simulateTouch는 초기 1회용으므로 update 에 대응 못하여 사용하면 안됨
+    resistanceRatio : isOneSlide && !isProgressBar ? 0 : _.result(options, 'resistanceRatio', 0.85), // slide가 1개일때 터치 반응 않하도록 설정 // simulateTouch는 초기 1회용이므로 update 에 대응 못하여 사용하면 안됨
     // loop : !(!isCalendar && isOneSlide),
     // autoplay: (!isCalendar && isOneSlide) ? false : options.autoplay
-    loop : isOneSlide ? false : options.loop, // update 시 반영이 core 소스에 반영이 안되어 .swiper-button-disabled 제대로 안걸려 삭제, 다른 방법 찾아봐야함 xxx
+    loop : isOneSlide ? false : options.loop,
     autoplay: isOneSlide ? false : options.autoplay
   }
 

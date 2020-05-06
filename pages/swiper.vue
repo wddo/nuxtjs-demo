@@ -12,10 +12,10 @@
       <button class="tabBtn" @click="addSlide(5)">add slide 5</button>
     </div>
     <ul class="tabs">
-      <li class="on"><a href="#" class="btn" data-idx="0">tab 1</a></li>
+      <li class=""><a href="#" class="btn" data-idx="0">tab 1</a></li>
       <li><a href="#" class="btn" data-idx="1">tab 2</a></li>
     </ul>
-    <div class="panel selected">
+    <div class="panel">
       <div v-if="isShowNum === 1 || (toggle && !isShowNum)">
         <h3>swiper 1</h3>
         <div v-swiper="swiperOptions" @slideChangeTransitionStart="onSlideChangeTransitionStart" class="swiper-container myswiper1">
@@ -135,9 +135,7 @@ export default {
 
     // not Vue click handler
     _.forEach(document.querySelectorAll('.btn'), item => {
-      item.addEventListener('click', function (e) {
-        console.log(e)
-
+      item.addEventListener('click', (e => {
         const target = e.currentTarget
         const parent = target.parentElement.parentElement
         const id = parseInt(target.getAttribute('data-idx'))
@@ -151,17 +149,19 @@ export default {
           }
         })
 
-        _.forEach(document.querySelectorAll('.panel'), (item, idx) => {
+        _.forEach(document.querySelectorAll('.panel'), ((item, idx) => {
           if (idx === id) {
             item.classList.add('selected')
             activateContent = item
+
+            // $nuxt.$fx.swiper.reset(this, {container: item}) //display 변경 후 1/1 원한다면 실행
           } else {
             item.classList.remove('selected')
           }
-        })
+        }).bind(this))
 
         e.preventDefault()
-      })
+      }).bind(this))
     })
   },
   methods: {
