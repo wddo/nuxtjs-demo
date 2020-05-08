@@ -44,7 +44,7 @@
     </div>
   </div>
 </template>
-vbas
+
 <script>
 export default {
   data() {
