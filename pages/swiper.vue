@@ -15,14 +15,15 @@
       <li class=""><a href="#" class="btn" data-idx="0">tab 1</a></li>
       <li><a href="#" class="btn" data-idx="1">tab 2</a></li>
     </ul>
-    <div class="panel">
+    <div class="panel selected">
       <div v-if="isShowNum === 1 || (toggle && !isShowNum)">
         <h3>swiper 1</h3>
         <div v-swiper="swiperOptions" @slideChangeTransitionStart="onSlideChangeTransitionStart" class="swiper-container myswiper1">
           <div class="swiper-wrapper">
-            <a href="#" class="swiper-slide" @click.prevent="slideClick('/sub')" v-for="(item, idx) in list" :key="idx">
+            <!--a href="#" class="swiper-slide" @click.prevent="slideClick('/sub')" v-for="(item, idx) in list" :key="idx">
               <fx-img :txt="item.name" :color="item.color"></fx-img>
-            </a>
+            </a-->
+            <slide v-for="(item, idx) in list" :item="item" :key="idx" />
           </div>
           <div class="swiper-pagination"></div>
           <div class="control">
@@ -34,18 +35,23 @@
       </div>
     </div>
     <div>swiepr binding : {{ num + 1 }}</div>
-    <!--div class="panel selected">
+    <div class="panel selected">
       <div v-if="isShowNum === 2 || (toggle && !isShowNum)">
         <h3>swiper 2</h3>
         <div v-swiper="swiperOptions2" class="swiper-container myswiper2">
           <div class="swiper-wrapper">
-            <a href="#" class="swiper-slide" @click.prevent="slideClick('/sub')" v-for="(item, idx) in list" :key="idx">
+            <!--a href="#" class="swiper-slide" @click.prevent="slideClick('/sub')" v-for="(item, idx) in list" :key="idx">
               <fx-img :txt="item.name" :color="item.color"></fx-img>
-            </a>
-            !--li class="swiper-slide" v-for="(item, idx) in list" :key="idx">
+            </a-->
+            <!--li class="swiper-slide" v-for="(item, idx) in list" :key="idx">
               <div @click="videoDimmedClick($event)" style="left:0;top:0;position:absolute;opacity:0.4;background-color:red;width:100%;height:100%"></div>
               <iframe src="https://www.youtube.com/embed/tgbNymZ7vqY" width="100%" height="100%" frameborder="0"></iframe>
-            </li--
+            </li-->
+            <li class="swiper-slide" v-for="(item, idx) in list" :key="idx">
+              <a href="#" @click.prevent="slideClick('/sub2')">
+                <fx-img :txt="item.name" :color="item.color"></fx-img>
+              </a>
+            </li>
           </div>
           <div class="swiper-pagination"></div>
           <div class="control">
@@ -55,15 +61,16 @@
           </div>
         </div>
       </div>
-    </div-->
+    </div>
   </div>
 </template>
 
 <script>
+import Slide from '~/components/Slide'
 import FxImg from '~/components/FxImg'
 
 export default {
-  components: {FxImg},
+  components: {Slide, FxImg},
   data() {
     return {
       num: 0,

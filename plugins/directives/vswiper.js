@@ -127,7 +127,8 @@ function findDataOfChildren(target, path) {
   if (!_.isNil(_.get(target, path))) {
     returnValue = _.get(target, path)
   } else {
-    const children = _.get(target, 'children')
+    let children = _.get(target, 'children')
+    if (_.isNil(children)) children = _.get(target, 'componentInstance._vnode.children') // swiper-slide가 컴포넌트 안에 존재할 경우
 
     _.forEach(children, item => {
       const result = findDataOfChildren(item, path)
@@ -446,7 +447,14 @@ function onChange(swiper, type) {
           item.addEventListener('click', function(e) {
             e.preventDefault()
           })
-	      }
+	      } else {
+          _.forEach(item.querySelectorAll('a[href="#"]'), a => {
+            // a.style.backgroundColor = 'blue'
+            a.addEventListener('click', function(e) {
+              e.preventDefault()
+            })
+          })
+        }
       }
     })
   }
