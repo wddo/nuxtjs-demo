@@ -79,7 +79,25 @@ export default {
         speed: 0,
         loop: true,
         lazy: true,
-        preloadImages: false
+        preloadImages: false,
+        on: {
+          transitionEnd: function () {
+            const thumbSwiperInfo = _.get(this, 'params.thumbs')
+            if (_.get(thumbSwiperInfo, 'swiper')) {
+              const swiper = thumbSwiperInfo.swiper
+
+              let preloader
+              let idx
+              const loadingSlide = _.filter(swiper.slides, slide => {
+                if (_.indexOf(slide.classList, 'swiper-slide-visible') >= 0) {
+                  return slide.querySelector('.swiper-lazy-preloader')
+                }
+              })
+
+              if (loadingSlide.length) swiper.lazy.load()
+            }
+          }
+        }
       },
       swiperThumbsOptions: {
         spaceBetween: 4,
@@ -94,6 +112,7 @@ export default {
       /** type === pc */
       swiperTopPcOptions: {
         effect: 'fade',
+        simulateTouch: false,
         lazy: true,
         preloadImages: false
       },
