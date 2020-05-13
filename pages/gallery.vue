@@ -26,7 +26,7 @@
       >
         <div class="swiper-wrapper">
           <a href="#" class="swiper-slide" v-for="(item, idx) in list" :key="idx">
-            <img :data-src="item.src" class="swiper-lazy" />
+            <fx-img :data-src="item.src" class="swiper-lazy" />
             <div class="swiper-lazy-preloader"></div>
           </a>
         </div>
@@ -48,7 +48,10 @@
 </template>
 
 <script>
+import FxImg from '~/components/FxImg'
+
 export default {
+  components: {FxImg},
   data() {
     return {
       type: process.client && typeof window.ontouchstart !== 'undefined' ? 'mobile' : 'pc',
@@ -56,20 +59,20 @@ export default {
       maxlen: 0,
       oriList: [
         // room
-        { name: 'slide1', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/9c56e672-cfdc-471a-8d38-381bbd5bfe3a.jpg' },
-        { name: 'slide2', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/8062b6db-e120-45c5-8535-1499bdcb2a47.jpg' },
+        { name: 'slide1', src: '2020/03/27/180000/9c56e672-cfdc-471a-8d38-381bbd5bfe3a.jpg' },
+        /* { name: 'slide2', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/8062b6db-e120-45c5-8535-1499bdcb2a47.jpg' },
         { name: 'slide3', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/ad66f2fd-3366-404a-96c9-0ba50bd2ccba.jpg' },
         { name: 'slide4', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/3040a988-56ec-473b-8ea2-0fe31c28c14c.jpg' },
         { name: 'slide5', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/7b4bc236-8d63-4163-baf9-aad40de161b7.jpg' },
-        { name: 'slide6', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/cf007c55-4918-4b3f-b8a2-3b3513f091a5.jpg' },
+        { name: 'slide6', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/cf007c55-4918-4b3f-b8a2-3b3513f091a5.jpg' },*/
 
         // outdoor
-        { name: 'slide7', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/398d4f95-bd26-4275-a140-d766ef39eb0d.jpg' },
-        { name: 'slide8', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/0c0c4c66-e64b-4ccb-9942-a066a7696465.jpg' },
+        { name: 'slide7', src: '2020/03/27/180000/398d4f95-bd26-4275-a140-d766ef39eb0d.jpg' },
+        /* { name: 'slide8', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/0c0c4c66-e64b-4ccb-9942-a066a7696465.jpg' },
         { name: 'slide9', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/49c23f6a-a50f-4702-9a17-38853c2c23cc.jpg' },
         { name: 'slide10', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/adde59b6-714f-4d0a-bb54-7acb7c1bac9b.jpg' },
         { name: 'slide11', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/804d35d3-7048-4820-a4e1-71448124cedf.jpg' },
-        { name: 'slide12', src: 'https://image.hanatour.com/usr/cms/resize/400_0/2020/03/26/720000/93384b6a-36b1-4f43-871f-5c2418cf1999.jpg' }
+        { name: 'slide12', src: 'https://image.hanatour.com/usr/cms/resize/400_0/2020/03/26/720000/93384b6a-36b1-4f43-871f-5c2418cf1999.jpg' } */
       ],
       swiperTopOptions: {
         effect: 'fade',
@@ -145,10 +148,10 @@ export default {
           this.list = _.take(this.oriList, this.maxlen)
           break
         case 'room':
-          this.list = _.take(this.oriList, 6)
+          this.list = _.take(this.oriList, 1)
           break
         case 'outdoor':
-          this.list = _.takeRight(this.oriList, 6)
+          this.list = _.takeRight(this.oriList, 1)
           break
         default:
       }
