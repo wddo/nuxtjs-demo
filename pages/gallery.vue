@@ -9,7 +9,8 @@
       >
         <div class="swiper-wrapper">
           <a href="#" class="swiper-slide" v-for="(item, idx) in list" :key="idx">
-            <img :src="item.src" />
+            <img :data-src="item.src" class="swiper-lazy" />
+            <div class="swiper-lazy-preloader"></div>
           </a>
         </div>
         <div class="swiper-pagination"></div>
@@ -25,7 +26,8 @@
       >
         <div class="swiper-wrapper">
           <a href="#" class="swiper-slide" v-for="(item, idx) in list" :key="idx">
-            <img :src="item.src" />
+            <img :data-src="item.src" class="swiper-lazy" />
+            <div class="swiper-lazy-preloader"></div>
           </a>
         </div>
 
@@ -51,37 +53,49 @@ export default {
     return {
       type: process.client && typeof window.ontouchstart !== 'undefined' ? 'mobile' : 'pc',
       list: [],
+      maxlen: 0,
       oriList: [
-        { name: 'slide1', src: 'http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg' },
-        { name: 'slide2', src: 'http://image1.hanatour.com/_images/main/md/banner_298.jpg' },
-        { name: 'slide3', src: 'http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg' },
-        { name: 'slide4', src: 'http://image1.hanatour.com/_images/main/md/banner_298.jpg' },
-        { name: 'slide5', src: 'http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg' },
-        { name: 'slide6', src: 'http://image1.hanatour.com/_images/main/md/banner_298.jpg' },
-        { name: 'slide7', src: 'http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg' },
-        { name: 'slide8', src: 'http://image1.hanatour.com/_images/main/md/banner_298.jpg' },
-        { name: 'slide9', src: 'http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg' },
-        { name: 'slide10', src: 'http://image1.hanatour.com/_images/main/md/banner_298.jpg' },
-        { name: 'slide11', src: 'http://image5.hanatour.com/mst_info_image/6/P001353616_M.jpg' },
-        { name: 'slide12', src: 'http://image1.hanatour.com/_images/main/md/banner_298.jpg' }
+        // room
+        { name: 'slide1', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/9c56e672-cfdc-471a-8d38-381bbd5bfe3a.jpg' },
+        { name: 'slide2', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/8062b6db-e120-45c5-8535-1499bdcb2a47.jpg' },
+        { name: 'slide3', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/ad66f2fd-3366-404a-96c9-0ba50bd2ccba.jpg' },
+        { name: 'slide4', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/3040a988-56ec-473b-8ea2-0fe31c28c14c.jpg' },
+        { name: 'slide5', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/7b4bc236-8d63-4163-baf9-aad40de161b7.jpg' },
+        { name: 'slide6', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/cf007c55-4918-4b3f-b8a2-3b3513f091a5.jpg' },
+
+        // outdoor
+        { name: 'slide7', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/398d4f95-bd26-4275-a140-d766ef39eb0d.jpg' },
+        { name: 'slide8', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/0c0c4c66-e64b-4ccb-9942-a066a7696465.jpg' },
+        { name: 'slide9', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/49c23f6a-a50f-4702-9a17-38853c2c23cc.jpg' },
+        { name: 'slide10', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/adde59b6-714f-4d0a-bb54-7acb7c1bac9b.jpg' },
+        { name: 'slide11', src: 'https://image.hanatour.com/usr/cms/resize/500_0/2020/03/27/180000/804d35d3-7048-4820-a4e1-71448124cedf.jpg' },
+        { name: 'slide12', src: 'https://image.hanatour.com/usr/cms/resize/400_0/2020/03/26/720000/93384b6a-36b1-4f43-871f-5c2418cf1999.jpg' }
       ],
       swiperTopOptions: {
         effect: 'fade',
+        fadeEffect: {
+          crossFade: true
+        },
+        speed: 0,
         loop: true,
-        loopedSlides: 5
+        lazy: true,
+        preloadImages: false
       },
       swiperThumbsOptions: {
         spaceBetween: 4,
         slidesPerView: 4,
         loop: true,
         freeMode: true,
-        loopedSlides: 5,
         watchSlidesVisibility: true,
-        watchSlidesProgress: true
+        watchSlidesProgress: true,
+        lazy: true,
+        preloadImages: false
       },
       /** type === pc */
       swiperTopPcOptions: {
-        effect: 'fade'
+        effect: 'fade',
+        lazy: true,
+        preloadImages: false
       },
       swiperThumbsPcOptions: {
         slidesPerView: 'auto',
@@ -90,14 +104,16 @@ export default {
         slidesOffsetAfter: 20,
         watchSlidesVisibility: true,
         watchSlidesProgress: true,
-        slideToClickedSlide: true
+        slideToClickedSlide: true,
+        lazy: true,
+        preloadImages: false
       }
     }
   },
   mounted() {
     console.log('!!!!! mounted')
-
-    this.list = _.take(this.oriList, this.oriList.length)
+    this.maxlen = this.oriList.length
+    this.list = _.take(this.oriList, this.maxlen)
 
     this.$nextTick(() => {
       this.$fx.swiper.resetGallery(this)
@@ -107,10 +123,10 @@ export default {
     categoryHandler(val) {
       switch (val) {
         case 'all':
-          this.list = _.take(this.oriList, this.oriList.length)
+          this.list = _.take(this.oriList, this.maxlen)
           break
         case 'room':
-          this.list = _.take(this.oriList, 4)
+          this.list = _.take(this.oriList, 6)
           break
         case 'outdoor':
           this.list = _.takeRight(this.oriList, 6)

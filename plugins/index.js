@@ -68,7 +68,7 @@ Vue.prototype.$fx = {
      * @property {Element} options.all - 갤러리 top, thumbs 모두 리셋 할지 유무
      */
     resetGallery(target, options) {
-      const resetThumbs = _.defaultTo(_.get(options, 'all'), false)
+      const resetThumbs = _.defaultTo(_.get(options, 'all'), true)
 
       if (target.$refs.swiperTop && target.$refs.swiperThumbs) {
         if (resetThumbs) $nuxt.$fx.swiper.reset(target.$refs.swiperThumbs)
@@ -86,6 +86,9 @@ Vue.prototype.$fx = {
 
           if (target.$refs.swiperThumbs.swiper.params.loop !== true) target.$refs.swiperThumbs.swiper.slideTo(0, 0)
         }
+
+        if (target.$refs.swiperTop.swiper.lazy) target.$refs.swiperTop.swiper.lazy.load()
+        if (target.$refs.swiperThumbs.swiper.lazy) target.$refs.swiperThumbs.swiper.lazy.load()
       }
     }
   }

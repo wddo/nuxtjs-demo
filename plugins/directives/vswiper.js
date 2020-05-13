@@ -194,13 +194,22 @@ function getDefaultOptions(el, vnode) {
 
 // swiper 삭제
 function deleteSwiper(el, binding, vnode, isCleanStyle) {
-  console.log('!!!!! deleteSwiper / ', _.join(el.classList, ', '))
   const swiper = el.swiper
 
   if (_.isNil(swiper)) return
 
+  const _isCleanStyle = _.defaultTo(isCleanStyle, true)
+
   if (swiper.params.exChange) delete swiper.params.exChange
-  if (swiper.params.init) swiper.destroy(false, _.defaultTo(isCleanStyle, true))
+  if (swiper.params.init) swiper.destroy(false, _isCleanStyle)
+
+  // lazy 클래스 삭제
+  if (_isCleanStyle && _.get(swiper.params, 'lazy.enabled')) {
+    const $lazyElements = swiper.slides.find('.' + swiper.params.lazy.elementClass)
+
+    $lazyElements.removeClass(swiper.params.lazy.loadedClass)
+    $lazyElements.removeClass(swiper.params.lazy.loadingClass)
+  }
 }
 
 // swiper 초기화
@@ -442,13 +451,13 @@ function onChange(swiper, type) {
     _.forEach(swiper.slides, item => {
       if (_.indexOf(item.classList, 'swiper-slide-duplicate') >= 0) {
         const link = item.getAttribute('href')
-        if (!_.isNil(link) && link === '#') {
+        if (!_.isNil(link) && (link === '#' || link === '#none')) {
           // item.style.backgroundColor = 'blue'
           item.addEventListener('click', function(e) {
             e.preventDefault()
           })
 	      } else {
-          _.forEach(item.querySelectorAll('a[href="#"]'), a => {
+          _.forEach(item.querySelectorAll('a[href="#"], a[href="#none"]'), a => {
             // a.style.backgroundColor = 'blue'
             a.addEventListener('click', function(e) {
               e.preventDefault()
