@@ -89,8 +89,8 @@ export default {
               let preloader
               let idx
               const loadingSlide = _.filter(swiper.slides, slide => {
-                if (_.indexOf(slide.classList, 'swiper-slide-visible') >= 0) {
-                  return slide.querySelector('.swiper-lazy-preloader')
+                if (_.indexOf(slide.classList, swiper.params.slideVisibleClass) >= 0) {
+                  return slide.querySelector('.' + swiper.params.lazy.preloaderClass)
                 }
               })
 
