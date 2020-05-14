@@ -2,21 +2,17 @@
   <!-- <div :style="`background-color: ${color}`">
     <span>{{txt}}</span>
   </div> -->
-  <img :src="realSrc" :title="this.title" />
+  <img :src="imgPath" :data-src="imgDataPath" :title="this.title" />
 </template>
 
 <script>
 export default {
   name: 'FxImg',
+  data() {
+    return {
+    }
+  },
   props: {
-    src: {
-      type: String,
-      default: ''
-    },
-    title : {
-      type: String,
-      default: ''
-    },
     /* txt : {
       type: String,
       default: 'empty'
@@ -25,47 +21,35 @@ export default {
       type: String,
       default: ''
     } */
-  },
-  methods: {
-    checkDataSrc(target) {
-      let count = 0
-      return new Promise((resolve, reject) => {
-        let timeId = setInterval(() => {
-          if (_.isNil(target.$el.getAttribute('data-src'))) {
-            clearInterval(timeId)
-            resolve(target.$el.getAttribute('src'))
-          }
-
-          count += 1
-
-          if (count > 10) {
-            clearInterval(timeId)
-            reject()
-          }
-        }, 1000)
-      })
+    src: {
+      type: String,
+      default: ''
     },
-    async fullSrc(_src) {
-      if (this.$attrs['data-src']) {
-        const dataSrc = await this.checkDataSrc(this)
-
-        console.log('xxxx complete')
-        _src = dataSrc
-      }
-
-      const result = 'https://image.hanatour.com/usr/cms/resize/500_0/' + _src
-
-      console.log('xxxx', result)
-
-      return result
+    dataSrc: {
+      type: String,
+      default: ''
+    },
+    title : {
+      type: String,
+      default: ''
     }
   },
+  methods: {
+  },
   computed: {
-    realSrc() {
-      const imgPath = this.src
-      console.log('xxxx call realSrc', imgPath)
-
-      return this.fullSrc(imgPath)
+    imgPath() {
+      if (_.indexOf(this.src, 'http') !== 0) {
+        return 'https://image.hanatour.com/usr/cms/resize/500_0/' + this.src
+      } else {
+        return _.defaultTo(this.src, '')
+      }
+    },
+    imgDataPath() {
+      if (_.indexOf(this.dataSrc, 'http') !== 0) {
+        return 'https://image.hanatour.com/usr/cms/resize/500_0/' + this.dataSrc
+      } else {
+        return _.defaultTo(this.dataSrc, '')
+      }
     }
   }
 }
