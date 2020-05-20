@@ -176,8 +176,8 @@ function getDefaultOptions(el, vnode) {
 
           const realSlide = _.nth(_.get(this, 'directiveData.vnode.children[0].children'), clickIdx)
           const childInfo = findDataOfChildren(realSlide, 'data.on.click.fns', slide)
-          const clickFn = childInfo.handler
-          const matchElement = childInfo.element
+          const clickFn = _.get(childInfo, 'handler')
+          const matchElement = _.get(childInfo, 'element')
 
           if (!_.isNil(clickFn) && !_.isNil(matchElement) && matchElement.contains(e.target)) {
             let evt
