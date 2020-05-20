@@ -1,7 +1,4 @@
 <template>
-  <!-- <div :style="`background-color: ${color}`">
-    <span>{{txt}}</span>
-  </div> -->
   <img :src="imgPath" :data-src="imgDataPath" :title="this.title" />
 </template>
 
@@ -13,17 +10,9 @@ export default {
     }
   },
   props: {
-    /* txt : {
-      type: String,
-      default: 'empty'
-    },
-    color : {
-      type: String,
-      default: ''
-    } */
     src: {
       type: String,
-      default: ''
+      default: '/img/none.gif'
     },
     dataSrc: {
       type: String,
@@ -38,14 +27,14 @@ export default {
   },
   computed: {
     imgPath() {
-      if (_.indexOf(this.src, 'http') !== 0) {
+      if (this.src.length && this.src.match(/^[\/|\.|\~]|http(|s)\:\/\//i) === null) {
         return 'https://image.hanatour.com/usr/cms/resize/500_0/' + this.src
       } else {
         return _.defaultTo(this.src, '')
       }
     },
     imgDataPath() {
-      if (_.indexOf(this.dataSrc, 'http') !== 0) {
+      if (this.src.length && this.dataSrc.match(/^[\/|\.|\~]|http(|s)\:\/\//i) === null) {
         return 'https://image.hanatour.com/usr/cms/resize/500_0/' + this.dataSrc
       } else {
         return _.defaultTo(this.dataSrc, '')
@@ -56,5 +45,7 @@ export default {
 </script>
 
 <style scoped>
-
+ img {
+   object-fit: cover;
+ }
 </style>

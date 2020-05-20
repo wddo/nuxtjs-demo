@@ -1,8 +1,9 @@
 <template>
   <div class="swiper-slide">
     <div>
+      <fx-img :title="item.name" />
       <a href="#" @click.prevent="slideClick('/sub')">
-        <fx-img :txt="item.name" :color="item.color" />
+        <span>{{item.name}}</span>
       </a>
     </div>
   </div>
@@ -58,5 +59,13 @@ export default {
   padding: 10px;
   width: 100%;
   height: 100%;
+}
+
+.swiper-slide img {
+  position: absolute;
+}
+
+.swiper-slide span {
+  border: 1px solid gray
 }
 </style>

@@ -47,11 +47,9 @@
               <div @click="videoDimmedClick($event)" style="left:0;top:0;position:absolute;opacity:0.4;background-color:red;width:100%;height:100%"></div>
               <iframe src="https://www.youtube.com/embed/tgbNymZ7vqY" width="100%" height="100%" frameborder="0"></iframe>
             </li-->
-            <li class="swiper-slide" v-for="(item, idx) in list" :key="idx">
-              <a href="#" @click.prevent="slideClick('/sub2')">
-                <fx-img :txt="item.name" :color="item.color"></fx-img>
-              </a>
-            </li>
+            <a href="#" class="swiper-slide" @click.prevent="slideClick('/sub2')" v-for="(item, idx) in list" :key="idx">
+              <fx-img :src="imgList[idx]" :title="item.name"></fx-img>
+            </a>
           </div>
           <div class="swiper-pagination"></div>
           <div class="control">
@@ -77,6 +75,14 @@ export default {
       isShowNum: 1,
       toggle: true,
       list: [],
+      imgList: [
+        '/img/img00.jpg',
+        '/img/img01.jpg',
+        '/img/img02.jpg',
+        '/img/img03.jpg',
+        /* '/img/img04.jpg',*/
+        '/img/img05.jpg'
+      ],
       msg: '',
       swiperOptions: {
         loop: true,
@@ -227,6 +233,8 @@ export default {
   -ms-flex-align: center;
   -webkit-align-items: center;
   align-items: center;
+
+  overflow: hidden;
 }
 
 .myswiper1 {
@@ -238,7 +246,6 @@ export default {
 }
 .myswiper1 .swiper-slide a {
   display: inline-block;
-  padding: 10px;
   width: 100%;
   height: 100%;
 }
@@ -247,9 +254,11 @@ export default {
   height: 200px;
 }
 .myswiper2 .swiper-slide {
-  padding: 10px;
   background-color: yellowgreen;
   border: 1px solid red;
+  -ms-flex-align: stretch;
+  -webkit-align-items: stretch;
+  align-items: stretch;
 }
 
 .control {

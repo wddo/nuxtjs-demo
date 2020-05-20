@@ -121,20 +121,24 @@ export default {
   }
 }
 
-function findDataOfChildren(target, path) {
+function findDataOfChildren(target, path, current) {
   let returnValue
 
   if (!_.isNil(_.get(target, path))) {
-    returnValue = _.get(target, path)
+    returnValue = {handler: _.get(target, path), element: current}
   } else {
     let children = _.get(target, 'children')
+    let cur_children = _.get(current, 'children')
+
     if (_.isNil(children)) children = _.get(target, 'componentInstance._vnode.children') // swiper-slide가 컴포넌트 안에 존재할 경우
 
-    _.forEach(children, item => {
-      const result = findDataOfChildren(item, path)
+    _.forEach(_.filter(children, item => {
+      return item.tag !== undefined
+    }), (item, idx) => {
+      const resultObj = findDataOfChildren(item, path, _.nth(cur_children, idx))
 
-      if (!_.isNil(result)) {
-        returnValue = result
+      if (!_.isNil(resultObj)) {
+        returnValue = resultObj
         return false
       }
     })
@@ -163,6 +167,7 @@ function getDefaultOptions(el, vnode) {
       }, */
       click: function(e) {
         // @click 대응
+        console.log(e)
         if (_.indexOf(_.result(this, 'clickedSlide.classList'), 'swiper-slide-duplicate') >= 0) {
           const slide = this.clickedSlide
           const clickIdx = parseInt(slide.getAttribute('data-swiper-slide-index'))
@@ -170,9 +175,11 @@ function getDefaultOptions(el, vnode) {
           if (_.isNil(clickIdx) || _.isNil(slide)) return
 
           const realSlide = _.nth(_.get(this, 'directiveData.vnode.children[0].children'), clickIdx)
-          const clickFn = findDataOfChildren(realSlide, 'data.on.click.fns')
+          const childInfo = findDataOfChildren(realSlide, 'data.on.click.fns', slide)
+          const clickFn = childInfo.handler
+          const matchElement = childInfo.element
 
-          if (!_.isNil(clickFn)) {
+          if (!_.isNil(clickFn) && !_.isNil(matchElement) && matchElement.contains(e.target)) {
             let evt
 
             if (e.type === 'mouseup') {
@@ -452,7 +459,7 @@ function onChange(swiper, type) {
       if (_.indexOf(item.classList, 'swiper-slide-duplicate') >= 0) {
         const link = item.getAttribute('href')
         if (!_.isNil(link) && (link === '#' || link === '#none')) {
-          // item.style.backgroundColor = 'blue'
+          // item.style.borderColor = 'blue'
           item.addEventListener('click', function(e) {
             e.preventDefault()
           })
