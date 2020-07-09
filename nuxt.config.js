@@ -1,4 +1,14 @@
 module.exports = {
+  server: {
+    port: 8000
+  },
+  modules: [
+    '@nuxtjs/vuetify'
+  ],
+  plugins: [
+    {src: '~/plugins/vuetify.js', mode: 'client'},
+    {src: '~/plugins/vue-inject.js', mode: 'client'}
+  ],
   /*
   ** Headers of the page
   */
