@@ -10,7 +10,7 @@
             <v-list-item v-for="(item, idx) in userList" :key="`user-${idx}`" dense>
               <v-list-item-content>{{item.name}}</v-list-item-content>
               <v-list-item-action>
-                <v-btn @click="removeUser(item.id)" icon>
+                <v-btn icon @click="showRemoveUserDialog(item.id)">
                   <v-icon color="grey lighten-1">mdi-close</v-icon>
                 </v-btn>
               </v-list-item-action>
@@ -33,6 +33,17 @@
         </v-row>
       </v-container>
     </v-form>
+    <v-dialog v-model="dialog">
+      <v-card>
+        <v-card-title>경고</v-card-title>
+        <v-divider class="mb-5"></v-divider>
+        <v-card-text>정말 삭제 하겠습니까?</v-card-text>
+        <v-card-actions class="justify-center">
+          <v-btn @click="removeUser" class="red white--text">Yes</v-btn>
+          <v-btn @click="dialog = false">No</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -43,7 +54,10 @@
     data() {
       return {
         userList: [],
-        userName: ''
+        userName: '',
+
+        dialog: false,
+        delUserId: null,
       }
     },
 
@@ -70,14 +84,21 @@
         })
       },
 
-      removeUser(id) {
+      showRemoveUserDialog(id) {
+        this.delUserId = id
+        this.dialog = true
+      },
+
+      removeUser() {
         axios.delete(`${this.$env.serverURI}/users`, {
           data: {
-            id
+            id: this.delUserId
           }
         }).then(res => {
           this.updateUserData()
         })
+
+        this.dialog = false
       },
     }
   }
