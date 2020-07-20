@@ -36,11 +36,12 @@
             <a href="#" onclick="tb('1');return false;">onclick tab1</a>
             <a href="#" onclick="tb('2');return false;">onclick tab2</a>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.4.0/gsap.min.js"><\/script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.19/lodash.core.js"><\/script>
             <script> console.log("log"); <\/script>
                   text
             <script>  TweenMax.to($(".cont"), 3, {marginLeft: "50%"});  <\/script>
             <script>  $(".myClass").css("color", "red");  <\/script>
-            <script>  function tb(n) {alert(n);}  <\/script>
+            <script>  function tb(n) {alert(n);} console.log(_); <\/script>
             <script>  $(document).ready(function () {
               $(".cont").before("<div>document ready !!!</div>");
               TweenMax.to($(".cont"), 3, {paddingTop: "20px"});
@@ -61,14 +62,14 @@
       inlineScript() {
         return Array.apply(null, { length: this.scriptTag.length }).map((item, idx) => {
           const inline = this.scriptTag[idx].match(regex) //inline 스크립트 대응
-          let vnode;
+          let logic;
 
           if (inline) {
-            vnode = inline.length > 1 ? inline[1] : ''
+            logic = inline.length > 1 ? inline[1] : ''
           }
 
-          return vnode
-        }).join('')
+          return logic
+        }).join('') // script 태그 제외한 로직만 문자열로 반환
       },
       callScript() {
         const srcScript = this.scriptTag.filter((item, idx) => {
@@ -76,6 +77,8 @@
 
           return regResult ? regResult.length > 1 : false
         })
+
+        let srcScriptCount = srcScript.length
 
         if (srcScript.length > 0) {
           srcScript.map(async (item, idx) => {
@@ -86,9 +89,13 @@
             if (realSrc) {
               await this.loadScript(realSrc)
 
-              this.$nextTick(function () {
-                this.startScript()
-              })
+              srcScriptCount -= 1
+
+              if (!srcScriptCount) {
+                this.$nextTick(function () {
+                  this.startScript()
+                })
+              }
             }
           })
         } else {
