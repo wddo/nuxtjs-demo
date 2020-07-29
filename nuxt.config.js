@@ -1,3 +1,5 @@
+const webpack = require('webpack')
+
 module.exports = {
   server: {
     port: 8000
@@ -43,7 +45,12 @@ module.exports = {
           exclude: /(node_modules)/
         })
       }
-    }
+    },
+    plugins: [
+      new webpack.ProvidePlugin({
+        '_': 'lodash'
+      })
+    ]
   }
 }
 

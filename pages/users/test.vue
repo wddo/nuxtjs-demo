@@ -6,20 +6,25 @@
       </v-row>
       <v-row>
         <v-col>
-          <v-list>
-            <v-list-item v-for="(item, idx) in userList" :key="`user-${idx}`" dense>
-              <v-list-item-content>{{item.name}}</v-list-item-content>
-              <v-list-item-action>
-                <v-btn icon @click="showRemoveUserDialog(item.id)">
-                  <v-icon color="grey lighten-1">mdi-close</v-icon>
-                </v-btn>
-              </v-list-item-action>
-            </v-list-item>
-          </v-list>
+          <v-skeleton-loader
+            class="mx-auto"
+            type="list"
+          >
+            <v-list>
+              <v-list-item v-for="(item, idx) in userList" :key="`user-${idx}`" dense>
+                <v-list-item-content>{{item.email}} / {{item.name}}</v-list-item-content>
+                <v-list-item-action>
+                  <v-btn icon @click="showRemoveUserDialog(item.email)">
+                    <v-icon color="grey lighten-1">mdi-close</v-icon>
+                  </v-btn>
+                </v-list-item-action>
+              </v-list-item>
+            </v-list>
+          </v-skeleton-loader>
         </v-col>
       </v-row>
     </v-container>
-    <v-form>
+    <!--v-form>
       <v-container>
         <v-row>
           <v-col class="d-flex align-baseline">
@@ -32,7 +37,7 @@
           </v-col>
         </v-row>
       </v-container>
-    </v-form>
+    </v-form-->
     <v-dialog v-model="dialog">
       <v-card>
         <v-card-title>경고</v-card-title>
@@ -57,7 +62,7 @@
         userName: '',
 
         dialog: false,
-        delUserId: null,
+        deleteIdentity: null,
       }
     },
 
@@ -79,20 +84,22 @@
       },
 
       updateUserData() {
+        this.$eventBus.$emit('loading-start')
         axios.get(`${this.$env.serverURI}/users`).then(res => {
           this.userList = res.data
+          this.$eventBus.$emit('loading-stop')
         })
       },
 
-      showRemoveUserDialog(id) {
-        this.delUserId = id
+      showRemoveUserDialog(email) {
+        this.deleteIdentity = email
         this.dialog = true
       },
 
       removeUser() {
         axios.delete(`${this.$env.serverURI}/users`, {
           data: {
-            id: this.delUserId
+            email: this.deleteIdentity
           }
         }).then(res => {
           this.updateUserData()

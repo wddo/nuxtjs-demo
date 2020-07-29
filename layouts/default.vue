@@ -3,6 +3,8 @@
     <v-app id="inspire">
       <navigation />
 
+      <Loading />
+
       <v-main>
         <nuxt />
       </v-main>
@@ -15,6 +17,7 @@
 <script>
 import Navigation from '~/components/Navigation'
 import Footer2 from '~/components/Footer2'
+import Loading from '~/components/Loading'
 
 export default {
   data() {
@@ -24,7 +27,8 @@ export default {
   },
   components: {
     Navigation,
-    Footer2
+    Footer2,
+    Loading,
   }
 }
 </script>
