@@ -1,13 +1,21 @@
 <template>
   <section class="container">
     <div>
-      Welcome
+      Welcome {{email}}
     </div>
   </section>
 </template>
 
 <script>
 export default {
+  data() {
+    return {
+      email : ''
+    }
+  },
+  mounted() {
+
+  },
   components: {
 
   }

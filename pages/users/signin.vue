@@ -67,10 +67,9 @@
       callLogin() {
         this.$http.post(`${this.$env.serverURI}/users/sign_in`, {
           email: this.email,
-          pw: this.pw
+          password: this.pw
         }).then(results => {
-          console.log("로그인 성공")
-          console.log(results)
+          this.$router.push('/');
         })
       }
     }
