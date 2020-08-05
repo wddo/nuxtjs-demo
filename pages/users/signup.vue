@@ -5,7 +5,7 @@
         <v-col class="text-h5">회원가입</v-col>
       </v-row>
       <template v-if="!isSignUpComp">
-        <v-form>
+        <v-form @submit.prevent="onSubmit">
           <v-text-field
             v-model="email"
             placeholder="example@domain.com"
@@ -34,7 +34,7 @@
           ></v-text-field>
           <v-row>
             <v-col class="d-flex justify-center">
-              <v-btn class="primary white--text" @click="clickSignUp">회원가입</v-btn>
+              <v-btn type="submit" class="primary white--text">회원가입</v-btn>
             </v-col>
           </v-row>
         </v-form>
@@ -77,9 +77,7 @@
 
         return _.isNil(this.pw.match(regex)) ? ['대,소문자/특수문자/숫자를 8자 이상 입력해주세요'] : [true]
       },
-      clickSignUp() {
-        console.log('clickSignUp')
-
+      onSubmit() {
         this.register()
       },
       register() {

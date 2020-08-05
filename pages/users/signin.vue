@@ -4,7 +4,7 @@
       <v-row>
         <v-col class="text-h5">로그인</v-col>
       </v-row>
-      <v-form>
+      <v-form ref="form" @submit.prevent="onSubmit">
         <v-text-field
           v-model="email"
           placeholder="example@domain.com"
@@ -24,17 +24,19 @@
           :success="pw_validate === true"
           class="pt-0"
         ></v-text-field>
+        <v-row>
+          <v-col class="d-flex justify-center">
+            <v-btn type="submit" class="primary white--text" :disabled="!isValid">로그인</v-btn>
+          </v-col>
+        </v-row>
       </v-form>
-      <v-row>
-        <v-col class="d-flex justify-center">
-          <v-btn class="primary white--text" @click="callLogin" :disabled="!activateBtn">로그인</v-btn>
-        </v-col>
-      </v-row>
     </v-container>
   </div>
 </template>
 
 <script>
+  import crypto from 'crypto'
+
   export default {
     data() {
       return {
@@ -45,7 +47,7 @@
       }
     },
     computed: {
-      activateBtn : function () {
+      isValid : function () {
         return this.email_validate === true && this.pw_validate === true
       }
     },
@@ -64,12 +66,19 @@
 
         return [this.pw_validate]
       },
-      callLogin() {
+      onSubmit() {
+        this.login()
+      },
+      login() {
         this.$http.post(`${this.$env.serverURI}/users/sign_in`, {
           email: this.email,
           password: this.pw
+        }, {
+          withCredentials : true
         }).then(results => {
-          this.$router.push('/');
+          //location.assign('/')
+          console.log(results.data)
+          this.$router.push('/')
         })
       }
     }
