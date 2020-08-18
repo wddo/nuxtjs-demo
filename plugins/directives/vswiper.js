@@ -174,7 +174,8 @@ function getDefaultOptions(el, vnode) {
 
           if (_.isNil(clickIdx) || _.isNil(slide)) return
 
-          const realSlide = _.nth(_.get(this, 'directiveData.vnode.children[0].children'), clickIdx)
+          const wrapper = _.filter(_.get(this, 'directiveData.vnode.children'), item => _.indexOf(_.split(_.get(item, 'data.staticClass'), ' '), this.params.wrapperClass) !== -1)
+          const realSlide = _.nth(_.get(wrapper, '[0].children'), clickIdx)
           const childInfo = findDataOfChildren(realSlide, 'data.on.click.fns', slide)
           const clickFn = _.get(childInfo, 'handler')
           const matchElement = _.get(childInfo, 'element')
