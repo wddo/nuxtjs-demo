@@ -126,6 +126,8 @@ function findDataOfChildren(target, path, current) {
 
   if (!_.isNil(_.get(target, path))) {
     returnValue = {handler: _.get(target, path), element: current}
+  } else if (!_.isNil(_.get(target, 'child._vnode.' + path))) { // root element 의 @click 대응
+    returnValue = {handler: _.get(target, 'child._vnode.' + path), element: current}
   } else {
     let children = _.get(target, 'children')
     let cur_children = _.get(current, 'children')
