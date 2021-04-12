@@ -8,7 +8,6 @@
  *  -fix- 위와 동일한 상태에서 바인딩 상태가 되면 resetSwiper 타면 next시 prev갔다 next되는 문제
  *        (추가한 el.swiper.params.loop !== _.get(swiperOptions, 'loop') 제거하고 update 루트에서 slideTo로 해결)
  *  -fix- 1/1 아닌 상태에서 slide 변경 시 페이징 초기화 되지 않음.. 오히려 이게 자연스러운 상태 (초기화를 원한다면 slide 변경 후 this.$fx.swiper.reset 실행)
- *  -fix- loop:true 에 slidePerView 가 1 이상인 경우 정방향으로 루핑 안되는 문제있어 해당 조건일 경우 loopAdditionalSlides: 1 로 해결
  *
  *  observer off!!
  *  -fix- dispaly:none 일때 slide 갯수 update 시 페이징 안박힘 (inserted 에 onChange(el.swiper, 'init') 추가로 해결)
