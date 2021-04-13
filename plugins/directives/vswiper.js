@@ -68,50 +68,51 @@ export default {
       const swiperOptions = _.merge({}, getDefaultOptions(el, vnode), binding.value)
       const isGallery = _.indexOf(el.classList, 'gallery-top') >= 0 || _.indexOf(el.classList, 'gallery-thumbs') >= 0
 
-      _.debounce(function () {
+      /* _.debounce(function () { */
       // wrapper가 없거나 || update시 최초 loop와 다르면 마지막 slide가 활성화된 상태가 되므로 resetSwiper 호출 (update 측에서 slideTo로 해결)
-        if (swiper.$wrapperEl.length === 0/* || el.swiper.params.loop !== _.get(swiperOptions, 'loop')*/) {
-          console.log('@@@@@ reset')
-          resetSwiper(el, binding, vnode)
+      if (swiper.$wrapperEl.length === 0/* || el.swiper.params.loop !== _.get(swiperOptions, 'loop')*/) {
+        console.log('@@@@@ reset')
+        resetSwiper(el, binding, vnode)
 
-          // onChange(swiper, 'init') // resetSwiper > initSwiper 내에서 호출하므로 중복호출이라 삭제
-        } else {
-          console.log('@@@@@ update')
-          if (swiper.navigation && !swiper.params.loop) swiper.navigation.destroy() // 네비 상태 삭제
-          if (swiper.params.loop) swiper.loopDestroy() // 복제 slide 삭제
+        // onChange(swiper, 'init') // resetSwiper > initSwiper 내에서 호출하므로 중복호출이라 삭제
+      } else {
+        console.log('@@@@@ update')
+        if (swiper.navigation && !swiper.params.loop) swiper.navigation.destroy() // 네비 상태 삭제
+        if (swiper.params.loop) swiper.loopDestroy() // 복제 slide 삭제
 
-          // 초기 options 받아 instance의 params와 병합하여 하여 initSwiper > importantOptions 의해 변경된 options 복구
-          _.merge(swiper.params, importantOptions(el, swiperOptions, vnode))
+        // 초기 options 받아 instance의 params와 병합하여 하여 initSwiper > importantOptions 의해 변경된 options 복구
+        _.merge(swiper.params, importantOptions(el, swiperOptions, vnode))
 
-          if (swiper.pagination) swiper.pagination.init() // 페이징 초기화
+        if (swiper.pagination) swiper.pagination.init() // 페이징 초기화
 
-          if (swiper.navigation) { // 네비게이션 초기화
-            swiper.navigation.init()
-            swiper.navigation.update()
-          }
-          if (swiper.thumbs) {
-            swiper.thumbs.update()
-          }
-          if (swiper.params.loop) swiper.loopCreate() // 복제 slide 생성
-
-          swiper.update() // updateSize(), updateSlides(), updateProgress(), updateSlidesClasses()
-
-          swiper.directiveData = {el, binding, vnode} // directive 데이터 재저장
-
-          afterModifySwiper(swiper) // 레이아웃 재정의
-
-          onChange(swiper, 'init')
-
-          initGallery(el)
-          fixObjectfit(el)
-
-          if (swiper.realIndex !== _.get(swiper, 'pageInfo.idx')) { // realIndex속성과 실제idx가 다르면 내부 loopCreate()로 인한 paging 어그러진것으로 판단
-            const idx = swiper.params.initialSlide + (swiper.params.loop) ? swiper.loopedSlides : 0
-
-            swiper.slideTo(idx, 0) // 맨앞으로 초기화
-          }
+        if (swiper.navigation) { // 네비게이션 초기화
+          swiper.navigation.init()
+          swiper.navigation.update()
         }
-      }, 100, {leading: isGallery})() // loopCreate 시점이 너무 빨라 이전 slide 가 복제되는 이슈로 인하여 100ms 딜레이
+        if (swiper.thumbs) {
+          swiper.thumbs.update()
+        }
+        if (swiper.params.loop) swiper.loopCreate() // 복제 slide 생성
+
+        swiper.update() // updateSize(), updateSlides(), updateProgress(), updateSlidesClasses()
+
+        swiper.directiveData = {el, binding, vnode} // directive 데이터 재저장
+
+        afterModifySwiper(swiper) // 레이아웃 재정의
+
+        onChange(swiper, 'init')
+
+        initGallery(el)
+        fixObjectfit(el)
+
+        if (swiper.realIndex !== _.get(swiper, 'pageInfo.idx')) { // realIndex속성과 실제idx가 다르면 내부 loopCreate()로 인한 paging 어그러진것으로 판단
+          const idx = swiper.params.initialSlide + (swiper.params.loop) ? swiper.loopedSlides : 0
+
+          swiper.slideTo(idx, 0) // 맨앞으로 초기화
+        }
+      }
+      /* }, 100, {leading: isGallery})() */ // loopCreate 시점이 너무 빨라 이전 slide 가 복제되는 이슈로 인하여 100ms 딜레이
+      // 100ms 딜레이로 인해 .reset() 시 삭제 초기화 순서 뒤바뀌어 @click 대응 시 wrapper 에 vnode.children 안잡히는 문제있어 debounce 제거 후 기존 문제인 이전 slide 복제 이슈 아직 발견 못함
     }
   },
   unbind(el, binding, vnode) {
